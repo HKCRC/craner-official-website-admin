@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         UserRole @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts    Post[]
+  products Product[]
+  media    Media[]
+}
+
+model Category {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  slug        String   @unique
+  title       String?
+  subtitle    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  postIds    String[] @db.ObjectId
+  posts      Post[]   @relation(fields: [postIds], references: [id])
+
+  productIds String[]  @db.ObjectId
+  products   Product[] @relation(fields: [productIds], references: [id])
+}
+
+model Post {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String     @unique
+  excerpt     String?
+  content     String
+  client      String?
+  tags        String[]
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  authorId String @db.ObjectId
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  coverMediaId String? @db.ObjectId
+  coverMedia   Media?  @relation("PostCoverMedia", fields: [coverMediaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  categoryIds String[]   @db.ObjectId
+  categories  Category[] @relation(fields: [categoryIds], references: [id])
+}
+
+// blocks is stored as JSON array of ProductBlock objects (see types/product.ts)
+model Product {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  subtitle    String?
+  slug        String     @unique
+  status      PostStatus @default(DRAFT)
+  tags        String[]
+  // featureList: [{label:string, value:string}]
+  featureList Json       @default("[]")
+  // blocks: ProductBlock[]
+  blocks      Json       @default("[]")
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  authorId String @db.ObjectId
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  coverMediaId String? @db.ObjectId
+  coverMedia   Media?  @relation("ProductCoverMedia", fields: [coverMediaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  categoryIds String[]   @db.ObjectId
+  categories  Category[] @relation(fields: [categoryIds], references: [id])
+}
+
+enum BannerLocale {
+  EN
+  ZH_HANS
+  ZH_HANT
+}
+
+enum BannerTemplate {
+  CAROUSEL
+  VIDEO
+}
+
+// HomepageBanner stores the banner config for a specific locale + template.
+// template=CAROUSEL: slides is a JSON array of {title, subtitle, imageUrl}
+// template=VIDEO:    videoUrl + title + subtitle
+model HomepageBanner {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  locale    BannerLocale   @unique
+  template  BannerTemplate @default(CAROUSEL)
+  // CAROUSEL: [{title:string, subtitle:string, imageUrl:string}]
+  // VIDEO:    [{title:string, subtitle:string, videoUrl:string}]
+  content   Json           @default("{}")
+  updatedAt DateTime       @updatedAt
+  createdAt DateTime       @default(now())
+}
+
+// FeaturedProduct: a manually-curated product card shown on the homepage/feature section.
+// media field: { type: "carousel", images: string[] } | { type: "video", url: string }
+model FeaturedProduct {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  order       Int      @default(0)
+  title       String   @default("")
+  subtitle    String   @default("")
+  description String   @default("")
+  productName String   @default("")
+  tags        String[]
+  // { type: "carousel", images: string[] } | { type: "video", url: string }
+  media       Json     @default("{\"type\":\"carousel\",\"images\":[]}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ContactInfo stores contact page configuration per locale.
+// qrCodes:      [{label:string, imageUrl:string}]
+// socialLinks:  [{platform:string, url:string}]
+model ContactInfo {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  locale      BannerLocale @unique
+  address1Region  String   @default("")
+  address1Detail  String   @default("")
+  address2Region  String   @default("")
+  address2Detail  String   @default("")
+  phone       String       @default("")
+  email       String       @default("")
+  // [{label:string, imageUrl:string}]
+  qrCodes     Json         @default("[]")
+  // [{platform:string, url:string}]
+  socialLinks Json         @default("[]")
+  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime     @default(now())
+}
+
+model Media {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  filename     String
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  url          String   @unique
+  createdAt    DateTime @default(now())
+
+  uploadedById String @db.ObjectId
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  coverForPosts    Post[]    @relation("PostCoverMedia")
+  coverForProducts Product[] @relation("ProductCoverMedia")
+}

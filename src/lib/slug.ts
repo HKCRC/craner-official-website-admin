@@ -7,6 +7,10 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
   // If the input was pure non-ASCII (e.g. Chinese), fall back to a short random id
-  return result || crypto.randomUUID().replace(/-/g, "").slice(0, 10);
+  return result || randomSlug();
+}
+
+export function randomSlug(length = 10): string {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, length);
 }
 

@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
-import { slugify } from "@/lib/slug";
+import { randomSlug, slugify } from "@/lib/slug";
 
 export default async function CategoriesPage() {
   const session = await requireSession().catch(() => null);
@@ -13,6 +13,8 @@ export default async function CategoriesPage() {
     orderBy: { createdAt: "desc" },
     select: { id: true, name: true, slug: true, title: true, subtitle: true, description: true, createdAt: true },
   });
+
+  const defaultSlug = randomSlug();
 
   async function createCategory(formData: FormData) {
     "use server";
@@ -56,8 +58,16 @@ export default async function CategoriesPage() {
               <input className="w-full rounded-md border px-3 py-2 text-sm" name="name" placeholder="如：案例研究" required />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Slug (optional)</span>
-              <input className="w-full rounded-md border px-3 py-2 text-sm" name="slug" placeholder="case-studies" />
+              <span className="text-sm font-medium">Slug</span>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                name="slug"
+                defaultValue={defaultSlug}
+                placeholder="case-studies"
+              />
+              <span className="block text-xs text-zinc-400">
+                这是 URL 上的后缀，如 /categories/<span className="font-mono">{defaultSlug}</span>。留空将自动生成。
+              </span>
             </label>
             <label className="block space-y-1">
               <span className="text-sm font-medium">大标题 Title (optional)</span>

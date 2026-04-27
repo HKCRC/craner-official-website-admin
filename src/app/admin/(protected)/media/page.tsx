@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { MediaUpload } from "@/app/admin/(protected)/media/MediaUpload";
+import { MediaItemCard } from "@/app/admin/(protected)/media/MediaItemCard";
 
 export default async function MediaPage() {
   const session = await requireSession().catch(() => null);
@@ -10,7 +10,14 @@ export default async function MediaPage() {
 
   const media = await prisma.media.findMany({
     orderBy: { createdAt: "desc" },
-    select: { id: true, url: true, originalName: true, sizeBytes: true, createdAt: true },
+    select: {
+      id: true,
+      url: true,
+      originalName: true,
+      sizeBytes: true,
+      mimeType: true,
+      createdAt: true,
+    },
   });
 
   return (
@@ -18,7 +25,7 @@ export default async function MediaPage() {
       <div className="flex items-end justify-between gap-6">
         <div>
           <h1 className="text-2xl font-semibold">Media library</h1>
-          <p className="text-sm text-zinc-600">Upload and reuse images in posts.</p>
+          <p className="text-sm text-zinc-600">Upload images or short videos and reuse URLs in content.</p>
         </div>
       </div>
 
@@ -33,19 +40,14 @@ export default async function MediaPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {media.map((m) => (
-              <div key={m.id} className="rounded-xl border bg-white overflow-hidden">
-                <div className="relative aspect-square bg-zinc-100">
-                  <Image src={m.url} alt={m.originalName} fill className="object-cover" />
-                </div>
-                <div className="p-3">
-                  <div className="truncate text-sm font-medium" title={m.originalName}>
-                    {m.originalName}
-                  </div>
-                  <div className="text-xs text-zinc-600">
-                    {(m.sizeBytes / 1024).toFixed(1)} KB
-                  </div>
-                </div>
-              </div>
+              <MediaItemCard
+                key={m.id}
+                id={m.id}
+                url={m.url}
+                originalName={m.originalName}
+                sizeBytes={m.sizeBytes}
+                mimeType={m.mimeType}
+              />
             ))}
           </div>
         )}

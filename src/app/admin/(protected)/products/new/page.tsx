@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
-import { slugify } from "@/lib/slug";
+import { randomSlug, slugify } from "@/lib/slug";
 import type { FeatureItem, ProductBlock } from "@/types/product";
 import { ProductNewForm } from "./ProductNewForm";
 
@@ -18,7 +18,10 @@ export default async function NewProductPage() {
   if (!session) redirect("/admin/login");
 
   const [categories, media] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
     prisma.media.findMany({
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -26,7 +29,10 @@ export default async function NewProductPage() {
     }),
   ]);
 
-  async function createProduct(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  async function createProduct(
+    _prev: ActionState,
+    formData: FormData,
+  ): Promise<ActionState> {
     "use server";
     try {
       const session = await requireSession();
@@ -37,18 +43,28 @@ export default async function NewProductPage() {
       const slug = slugify(slugRaw || title);
       const status = String(formData.get("status") || "DRAFT");
       const tagsRaw = String(formData.get("tags") || "");
-      const tags = tagsRaw.split(",").map((t) => t.trim()).filter(Boolean);
-      const coverMediaId = String(formData.get("coverMediaId") || "").trim() || null;
+      const tags = tagsRaw
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const coverMediaId =
+        String(formData.get("coverMediaId") || "").trim() || null;
       const categoryIds = formData.getAll("categoryIds").map(String);
 
       let blocks: ProductBlock[] = [];
       let featureList: FeatureItem[] = [];
-      try { blocks = JSON.parse(String(formData.get("blocks") || "[]")); } catch {}
-      try { featureList = JSON.parse(String(formData.get("featureList") || "[]")); } catch {}
+      try {
+        blocks = JSON.parse(String(formData.get("blocks") || "[]"));
+      } catch {}
+      try {
+        featureList = JSON.parse(String(formData.get("featureList") || "[]"));
+      } catch {}
 
       if (!title) return { ok: false, error: "请填写标题" };
-      if (categoryIds.length < 1) return { ok: false, error: "至少选择一个分类" };
-      if (status !== "DRAFT" && status !== "PUBLISHED") return { ok: false, error: "无效的状态" };
+      if (categoryIds.length < 1)
+        return { ok: false, error: "至少选择一个分类" };
+      if (status !== "DRAFT" && status !== "PUBLISHED")
+        return { ok: false, error: "无效的状态" };
 
       const product = await prisma.product.create({
         data: {
@@ -75,5 +91,14 @@ export default async function NewProductPage() {
     }
   }
 
-  return <ProductNewForm categories={categories} media={media} createAction={createProduct} />;
+  const defaultSlug = randomSlug();
+
+  return (
+    <ProductNewForm
+      categories={categories}
+      media={media}
+      defaultSlug={defaultSlug}
+      createAction={createProduct}
+    />
+  );
 }

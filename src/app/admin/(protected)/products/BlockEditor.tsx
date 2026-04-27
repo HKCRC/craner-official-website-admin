@@ -21,6 +21,20 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+function normalizeBlocks(input: ProductBlock[]): ProductBlock[] {
+  return input.map((b) => {
+    if (b.type !== "text-image") return b;
+    const anyB = b as TextImageBlock & { images?: BlockImage[] };
+    const images =
+      Array.isArray(anyB.images) && anyB.images.length > 0
+        ? anyB.images
+        : anyB.image?.url
+          ? [anyB.image]
+          : [{ url: "" }];
+    return { ...anyB, images };
+  });
+}
+
 // ─── sub-components ─────────────────────────────────────────────────────────
 
 function Field({
@@ -174,6 +188,103 @@ function ImageFields({
   );
 }
 
+function ImagesFields({
+  images,
+  onChange,
+  label = "Images",
+  mediaItems,
+}: {
+  images: BlockImage[];
+  onChange: (v: BlockImage[]) => void;
+  label?: string;
+  mediaItems: MediaItem[];
+}) {
+  function update(index: number, next: BlockImage) {
+    onChange(images.map((img, i) => (i === index ? next : img)));
+  }
+  function remove(index: number) {
+    const next = images.filter((_, i) => i !== index);
+    onChange(next.length > 0 ? next : [{ url: "" }]);
+  }
+  function add() {
+    onChange([...images, { url: "" }]);
+  }
+  function move(index: number, dir: -1 | 1) {
+    const target = clamp(index + dir, 0, images.length - 1);
+    if (target === index) return;
+    const next = [...images];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end justify-between gap-3">
+        <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
+          {label}
+        </span>
+        <button
+          type="button"
+          onClick={add}
+          className="rounded-lg border border-zinc-200 px-3 py-2 text-xs hover:bg-zinc-100"
+        >
+          + 添加图片
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {images.map((img, idx) => (
+          <div
+            key={idx}
+            className="rounded-xl border border-zinc-200 bg-white p-3"
+          >
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="text-xs text-zinc-500">
+                第 {idx + 1} 张（共 {images.length} 张）
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={idx === 0}
+                  onClick={() => move(idx, -1)}
+                  className="rounded px-2 py-1 text-zinc-400 hover:text-black hover:bg-zinc-100 disabled:opacity-30"
+                  title="上移"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  disabled={idx === images.length - 1}
+                  onClick={() => move(idx, 1)}
+                  className="rounded px-2 py-1 text-zinc-400 hover:text-black hover:bg-zinc-100 disabled:opacity-30"
+                  title="下移"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(idx)}
+                  className="rounded px-2 py-1 text-red-400 hover:text-red-700 hover:bg-red-50"
+                  title="删除此图片"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <ImageFields
+              img={img}
+              onChange={(v) => update(idx, v)}
+              label={idx === 0 ? "轮播图片" : undefined}
+              mediaItems={mediaItems}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TextFields({
   text,
   onChange,
@@ -296,7 +407,9 @@ function TextImageEditor({
           <option value="image-left">图片在左，文字在右</option>
         </select>
       </label>
-      <div className={`grid grid-cols-2 gap-4 ${isTextLeft ? "" : "direction-rtl"}`}>
+      <div
+        className={`grid grid-cols-2 gap-4 ${isTextLeft ? "" : "direction-rtl"}`}
+      >
         <div className={isTextLeft ? "" : "order-2"}>
           <TextFields
             text={block.text}
@@ -304,9 +417,10 @@ function TextImageEditor({
           />
         </div>
         <div className={isTextLeft ? "" : "order-1"}>
-          <ImageFields
-            img={block.image}
-            onChange={(i) => onChange({ ...block, image: i })}
+          <ImagesFields
+            label="轮播图片（多张）"
+            images={block.images}
+            onChange={(images) => onChange({ ...block, images })}
             mediaItems={mediaItems}
           />
         </div>
@@ -389,7 +503,12 @@ function QaEditor({
 
 // ─── Template picker ─────────────────────────────────────────────────────────
 
-const TEMPLATES: { key: ProductBlock["type"]; label: string; desc: string; icon: string }[] = [
+const TEMPLATES: {
+  key: ProductBlock["type"];
+  label: string;
+  desc: string;
+  icon: string;
+}[] = [
   {
     key: "text-image",
     label: "文字 + 图片",
@@ -419,7 +538,7 @@ const TEMPLATES: { key: ProductBlock["type"]; label: string; desc: string; icon:
 function makeBlock(type: ProductBlock["type"]): ProductBlock {
   const id = uid();
   if (type === "text-image")
-    return { id, type, layout: "text-left", text: {}, image: { url: "" } };
+    return { id, type, layout: "text-left", text: {}, images: [{ url: "" }] };
   if (type === "image-image")
     return { id, type, left: { url: "" }, right: { url: "" } };
   if (type === "full-image") return { id, type, image: { url: "" } };
@@ -437,7 +556,7 @@ function FeatureListEditor({
 }) {
   function update(index: number, field: keyof FeatureItem, val: string) {
     const next = items.map((item, i) =>
-      i === index ? { ...item, [field]: val } : item
+      i === index ? { ...item, [field]: val } : item,
     );
     onChange(next);
   }
@@ -504,7 +623,9 @@ export function BlockEditor({
   blocksName = "blocks",
   featureListName = "featureList",
 }: Props) {
-  const [blocks, setBlocks] = useState<ProductBlock[]>(initialBlocks);
+  const [blocks, setBlocks] = useState<ProductBlock[]>(
+    normalizeBlocks(initialBlocks),
+  );
   const [features, setFeatures] = useState<FeatureItem[]>(initialFeatureList);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -516,7 +637,7 @@ export function BlockEditor({
           behavior: "smooth",
           block: "start",
         }),
-      50
+      50,
     );
   }, []);
 
@@ -566,7 +687,9 @@ export function BlockEditor({
 
       {/* ── Template palette ── */}
       <div className="space-y-3">
-        <div className="font-semibold text-sm">内容模块 — 点击模板添加到下方</div>
+        <div className="font-semibold text-sm">
+          内容模块 — 点击模板添加到下方
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {TEMPLATES.map((t) => (
             <button
@@ -577,7 +700,9 @@ export function BlockEditor({
             >
               <span className="text-3xl">{t.icon}</span>
               <span className="text-sm font-semibold">{t.label}</span>
-              <span className="text-xs text-zinc-500 leading-snug">{t.desc}</span>
+              <span className="text-xs text-zinc-500 leading-snug">
+                {t.desc}
+              </span>
             </button>
           ))}
         </div>
@@ -656,6 +781,8 @@ export function BlockEditor({
 function BlockPreview({ block }: { block: ProductBlock }) {
   if (block.type === "text-image") {
     const isTextLeft = block.layout === "text-left";
+    const first = block.images?.[0] ?? block.image ?? { url: "" };
+    const count = block.images?.length ?? (block.image?.url ? 1 : 0);
     return (
       <div
         className={`flex gap-3 rounded-xl bg-white border border-zinc-100 p-3 text-xs ${
@@ -672,7 +799,9 @@ function BlockPreview({ block }: { block: ProductBlock }) {
             </p>
           )}
           {block.text.description && (
-            <p className="text-zinc-400 line-clamp-2">{block.text.description}</p>
+            <p className="text-zinc-400 line-clamp-2">
+              {block.text.description}
+            </p>
           )}
           {!block.text.heading &&
             !block.text.subheading &&
@@ -680,17 +809,18 @@ function BlockPreview({ block }: { block: ProductBlock }) {
               <p className="text-zinc-300 italic">文字待填写…</p>
             )}
         </div>
-        <div className="w-24 shrink-0 rounded-lg bg-zinc-100 flex items-center justify-center overflow-hidden">
-          {block.image.url ? (
+        <div className="w-24 shrink-0 rounded-lg bg-zinc-100 flex items-center justify-center overflow-hidden relative">
+          {first.url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={block.image.url}
-              alt=""
-              className="h-16 w-24 object-cover"
-            />
+            <img src={first.url} alt="" className="h-16 w-24 object-cover" />
           ) : (
             <span className="text-zinc-300 text-xs">图片</span>
           )}
+          {count > 1 ? (
+            <span className="absolute right-1 bottom-1 rounded bg-black/60 text-white text-[10px] px-1.5 py-0.5">
+              {count}
+            </span>
+          ) : null}
         </div>
       </div>
     );
@@ -743,10 +873,16 @@ function BlockPreview({ block }: { block: ProductBlock }) {
     return (
       <div className="rounded-xl bg-white border border-zinc-100 p-3 text-xs space-y-1">
         <p className="font-semibold truncate">
-          Q: {block.question || <span className="text-zinc-300 italic">问题待填写</span>}
+          Q:{" "}
+          {block.question || (
+            <span className="text-zinc-300 italic">问题待填写</span>
+          )}
         </p>
         <p className="text-zinc-500 line-clamp-2">
-          A: {block.answer || <span className="text-zinc-300 italic">回答待填写</span>}
+          A:{" "}
+          {block.answer || (
+            <span className="text-zinc-300 italic">回答待填写</span>
+          )}
         </p>
       </div>
     );

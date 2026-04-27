@@ -27,13 +27,15 @@ export function MediaUpload() {
   return (
     <div className="rounded-xl border bg-white p-5 space-y-3">
       <div>
-        <h2 className="text-lg font-semibold">Upload image</h2>
-        <p className="text-sm text-zinc-600">Max size 5MB. Images only.</p>
+        <h2 className="text-lg font-semibold">Upload media</h2>
+        <p className="text-sm text-zinc-600">
+          Images up to 5MB, or MP4 / WebM up to 50MB.
+        </p>
       </div>
 
       <input
         type="file"
-        accept="image/*"
+        accept="image/*,video/mp4,video/webm,.mp4,.webm"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
       />
 

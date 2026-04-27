@@ -24,7 +24,13 @@ export interface TextImageBlock {
   type: "text-image";
   layout: "text-left" | "image-left"; // which side the text is on
   text: BlockText;
-  image: BlockImage;
+  /**
+   * Multiple images for carousel use-cases.
+   * Backwards compatibility: older data may have `image` instead of `images`.
+   */
+  images: BlockImage[];
+  /** @deprecated use `images` */
+  image?: BlockImage;
 }
 
 export interface ImageImageBlock {

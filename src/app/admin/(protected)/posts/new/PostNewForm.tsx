@@ -14,10 +14,11 @@ type ActionState = { ok: true } | { ok: false; error: string } | null;
 interface Props {
   categories: Category[];
   media: MediaItem[];
+  defaultSlug: string;
   createAction: (state: ActionState, formData: FormData) => Promise<ActionState>;
 }
 
-export function PostNewForm({ categories, media, createAction }: Props) {
+export function PostNewForm({ categories, media, defaultSlug, createAction }: Props) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(createAction, null);
 
   return (
@@ -44,8 +45,15 @@ export function PostNewForm({ categories, media, createAction }: Props) {
               <input className="w-full rounded-md border px-3 py-2" name="title" required />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Slug (optional)</span>
-              <input className="w-full rounded-md border px-3 py-2" name="slug" />
+              <span className="text-sm font-medium">Slug</span>
+              <input
+                className="w-full rounded-md border px-3 py-2"
+                name="slug"
+                defaultValue={defaultSlug}
+              />
+              <span className="block text-xs text-zinc-400">
+                这是 URL 上的后缀，如 /posts/<span className="font-mono">{defaultSlug}</span>。留空将自动生成。
+              </span>
             </label>
             <label className="block space-y-1 md:col-span-2">
               <span className="text-sm font-medium">Excerpt (optional)</span>

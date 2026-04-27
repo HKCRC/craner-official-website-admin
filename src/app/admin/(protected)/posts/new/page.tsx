@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
-import { slugify } from "@/lib/slug";
+import { randomSlug, slugify } from "@/lib/slug";
 import { PostNewForm } from "./PostNewForm";
 
 export const runtime = "nodejs";
@@ -71,5 +71,14 @@ export default async function NewPostPage() {
     }
   }
 
-  return <PostNewForm categories={categories} media={media} createAction={createPost} />;
+  const defaultSlug = randomSlug();
+
+  return (
+    <PostNewForm
+      categories={categories}
+      media={media}
+      defaultSlug={defaultSlug}
+      createAction={createPost}
+    />
+  );
 }

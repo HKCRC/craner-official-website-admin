@@ -69,6 +69,9 @@ export default async function CategoryEditPage({
                 name="slug"
                 defaultValue={category.slug}
               />
+              <span className="block text-xs text-zinc-400">
+                这是 URL 上的后缀，如 /categories/<span className="font-mono">{category.slug}</span>。留空将自动生成。
+              </span>
             </label>
             <label className="block space-y-1">
               <span className="text-sm font-medium">大标题 Title (optional)</span>

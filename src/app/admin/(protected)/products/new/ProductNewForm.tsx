@@ -14,10 +14,11 @@ type ActionState = { ok: true } | { ok: false; error: string } | null;
 interface Props {
   categories: Category[];
   media: MediaItem[];
+  defaultSlug: string;
   createAction: (state: ActionState, formData: FormData) => Promise<ActionState>;
 }
 
-export function ProductNewForm({ categories, media, createAction }: Props) {
+export function ProductNewForm({ categories, media, defaultSlug, createAction }: Props) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(createAction, null);
 
   return (
@@ -58,12 +59,16 @@ export function ProductNewForm({ categories, media, createAction }: Props) {
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-sm font-medium">Slug（留空自动生成）</span>
+                <span className="text-sm font-medium">Slug</span>
                 <input
                   name="slug"
+                  defaultValue={defaultSlug}
                   className="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
                   placeholder="url-friendly-slug"
                 />
+                <span className="block text-xs text-zinc-400">
+                  这是 URL 上的后缀，如 /products/<span className="font-mono">{defaultSlug}</span>。留空将自动生成。
+                </span>
               </label>
               <label className="block space-y-1">
                 <span className="text-sm font-medium">Tags（逗号分隔）</span>

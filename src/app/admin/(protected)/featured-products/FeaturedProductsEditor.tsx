@@ -42,20 +42,27 @@ export default function FeaturedProductsEditor() {
   useEffect(() => {
     fetch("/api/featured-products")
       .then((r) => r.json())
-      .then(({ items }) => { if (items) setItems(items); })
+      .then(({ items }) => {
+        if (items) setItems(items);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   function addNew() {
     const tempId = `new-${Date.now()}`;
-    const draft = { ...emptyProduct(items.length), id: tempId } as FeaturedProduct;
+    const draft = {
+      ...emptyProduct(items.length),
+      id: tempId,
+    } as FeaturedProduct;
     setItems((prev) => [...prev, draft]);
     setExpandedId(tempId);
   }
 
   async function saveItem(draft: FeaturedProduct) {
     const isNew = draft.id.startsWith("new-");
-    const url = isNew ? "/api/featured-products" : `/api/featured-products/${draft.id}`;
+    const url = isNew
+      ? "/api/featured-products"
+      : `/api/featured-products/${draft.id}`;
     const method = isNew ? "POST" : "PUT";
     const res = await fetch(url, {
       method,
@@ -72,9 +79,7 @@ export default function FeaturedProductsEditor() {
     });
     const json = await res.json();
     if (json.ok) {
-      setItems((prev) =>
-        prev.map((p) => (p.id === draft.id ? json.item : p))
-      );
+      setItems((prev) => prev.map((p) => (p.id === draft.id ? json.item : p)));
       setExpandedId(json.item.id);
     }
     return json.ok;
@@ -95,7 +100,11 @@ export default function FeaturedProductsEditor() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-40 text-zinc-400">Loading…</div>;
+    return (
+      <div className="flex items-center justify-center h-40 text-zinc-400">
+        Loading…
+      </div>
+    );
   }
 
   return (
@@ -112,7 +121,9 @@ export default function FeaturedProductsEditor() {
           item={item}
           index={idx}
           expanded={expandedId === item.id}
-          onToggle={() => setExpandedId(expandedId === item.id ? null : item.id)}
+          onToggle={() =>
+            setExpandedId(expandedId === item.id ? null : item.id)
+          }
           onChange={(patch) => updateItem(item.id, patch)}
           onSave={() => saveItem(item)}
           onDelete={() => deleteItem(item.id)}
@@ -151,7 +162,9 @@ function ProductCard({
   onDelete: () => void;
 }) {
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function handleSave() {
@@ -176,7 +189,11 @@ function ProductCard({
           {index + 1}
         </span>
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{item.productName || item.title || <span className="text-zinc-400 italic">未命名产品</span>}</div>
+          <div className="font-medium truncate">
+            {item.productName || item.title || (
+              <span className="text-zinc-400 italic">未命名产品</span>
+            )}
+          </div>
           {item.title && item.productName && (
             <div className="text-xs text-zinc-400 truncate">{item.title}</div>
           )}
@@ -185,12 +202,20 @@ function ProductCard({
           {item.tags.length > 0 && (
             <div className="hidden sm:flex gap-1">
               {item.tags.slice(0, 3).map((t, i) => (
-                <span key={i} className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">{t}</span>
+                <span
+                  key={i}
+                  className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600"
+                >
+                  {t}
+                </span>
               ))}
             </div>
           )}
           <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
             className={`text-zinc-400 transition-transform ${expanded ? "rotate-180" : ""}`}
           >
             <path d="M7 10l5 5 5-5z" />
@@ -232,7 +257,12 @@ function ProductCard({
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.tags.join(", ")}
                 onChange={(e) =>
-                  onChange({ tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) })
+                  onChange({
+                    tags: e.target.value
+                      .split(",")
+                      .map((t) => t.trim())
+                      .filter(Boolean),
+                  })
                 }
                 placeholder="AI, 医疗, SaaS"
               />
@@ -257,14 +287,24 @@ function ProductCard({
           {/* Actions */}
           <div className="flex items-center justify-between pt-2">
             <button
-              onClick={() => { if (confirm("确认删除？")) onDelete(); }}
+              onClick={() => {
+                if (confirm("确认删除？")) onDelete();
+              }}
               className="text-sm text-red-500 hover:text-red-700 transition"
             >
               删除 / Delete
             </button>
             <div className="flex items-center gap-3">
-              {saveStatus === "success" && <span className="text-sm text-green-600 font-medium">✓ 已保存</span>}
-              {saveStatus === "error" && <span className="text-sm text-red-600 font-medium">保存失败</span>}
+              {saveStatus === "success" && (
+                <span className="text-sm text-green-600 font-medium">
+                  ✓ 已保存
+                </span>
+              )}
+              {saveStatus === "error" && (
+                <span className="text-sm text-red-600 font-medium">
+                  保存失败
+                </span>
+              )}
               <button
                 onClick={handleSave}
                 disabled={saving}
@@ -281,7 +321,13 @@ function ProductCard({
 }
 
 /* ── Media editor ── */
-function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) => void }) {
+function MediaEditor({
+  media,
+  onChange,
+}: {
+  media: Media;
+  onChange: (m: Media) => void;
+}) {
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
@@ -317,7 +363,10 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
 
   function removeImage(idx: number) {
     if (media.type !== "carousel") return;
-    onChange({ type: "carousel", images: media.images.filter((_, i) => i !== idx) });
+    onChange({
+      type: "carousel",
+      images: media.images.filter((_, i) => i !== idx),
+    });
   }
 
   return (
@@ -347,26 +396,46 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {media.images.map((url, idx) => (
-              <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border bg-zinc-100 group">
-                <Image src={url} alt={`image ${idx + 1}`} fill className="object-cover" />
+              <div
+                key={idx}
+                className="relative aspect-square rounded-lg overflow-hidden border bg-zinc-100 group"
+              >
+                <Image
+                  src={url}
+                  alt={`image ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                />
                 <button
                   type="button"
                   onClick={() => removeImage(idx)}
                   className="absolute top-1 right-1 hidden group-hover:flex w-6 h-6 items-center justify-center rounded-full bg-black/60 text-white"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                   </svg>
                 </button>
               </div>
             ))}
             {/* Upload slot */}
-            <label className={`flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed text-xs transition ${uploadingIdx === media.images.length ? "opacity-50 pointer-events-none border-zinc-300 text-zinc-300" : "border-zinc-300 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600"}`}>
+            <label
+              className={`flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed text-xs transition ${uploadingIdx === media.images.length ? "opacity-50 pointer-events-none border-zinc-300 text-zinc-300" : "border-zinc-300 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600"}`}
+            >
               {uploadingIdx === media.images.length ? (
                 <span>上传中…</span>
               ) : (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                   </svg>
                   <span>添加图片</span>
@@ -386,7 +455,9 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
             </label>
           </div>
           {media.images.length === 0 && (
-            <p className="text-xs text-zinc-400">点击「添加图片」上传轮播图（支持多张）</p>
+            <p className="text-xs text-zinc-400">
+              点击「添加图片」上传轮播图（支持多张）
+            </p>
           )}
         </div>
       )}
@@ -404,8 +475,15 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
           </Field>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400">— 或 —</span>
-            <label className={`flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-2 text-xs transition ${uploadingVideo ? "opacity-50 pointer-events-none border-zinc-200 text-zinc-300" : "border-zinc-300 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600"}`}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <label
+              className={`flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-2 text-xs transition ${uploadingVideo ? "opacity-50 pointer-events-none border-zinc-200 text-zinc-300" : "border-zinc-300 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600"}`}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
               </svg>
               {uploadingVideo ? "上传中…" : "上传视频文件"}
@@ -422,7 +500,9 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
               />
             </label>
             {media.url && (
-              <span className="text-xs text-zinc-500 truncate max-w-xs">{media.url}</span>
+              <span className="text-xs text-zinc-500 truncate max-w-xs">
+                {media.url}
+              </span>
             )}
           </div>
         </div>
@@ -432,7 +512,15 @@ function MediaEditor({ media, onChange }: { media: Media; onChange: (m: Media) =
 }
 
 /* ── Shared UI ── */
-function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={`space-y-1 ${className}`}>
       <label className="text-xs font-medium text-zinc-500">{label}</label>

@@ -3,6 +3,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/slug";
@@ -28,7 +29,10 @@ export default async function EditProductPage({
       where: { id },
       include: { categories: { select: { id: true } } },
     }),
-    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
     prisma.media.findMany({
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -40,10 +44,17 @@ export default async function EditProductPage({
 
   let initialBlocks: ProductBlock[] = [];
   let initialFeatures: FeatureItem[] = [];
-  try { initialBlocks = product.blocks as ProductBlock[]; } catch {}
-  try { initialFeatures = product.featureList as FeatureItem[]; } catch {}
+  try {
+    initialBlocks = product.blocks as unknown as ProductBlock[];
+  } catch {}
+  try {
+    initialFeatures = product.featureList as unknown as FeatureItem[];
+  } catch {}
 
-  async function updateProduct(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  async function updateProduct(
+    _prev: ActionState,
+    formData: FormData,
+  ): Promise<ActionState> {
     "use server";
     try {
       await requireSession();
@@ -54,18 +65,28 @@ export default async function EditProductPage({
       const slug = slugify(slugRaw || title);
       const status = String(formData.get("status") || "DRAFT");
       const tagsRaw = String(formData.get("tags") || "");
-      const tags = tagsRaw.split(",").map((t) => t.trim()).filter(Boolean);
-      const coverMediaId = String(formData.get("coverMediaId") || "").trim() || null;
+      const tags = tagsRaw
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const coverMediaId =
+        String(formData.get("coverMediaId") || "").trim() || null;
       const categoryIds = formData.getAll("categoryIds").map(String);
 
       let blocks: ProductBlock[] = [];
       let featureList: FeatureItem[] = [];
-      try { blocks = JSON.parse(String(formData.get("blocks") || "[]")); } catch {}
-      try { featureList = JSON.parse(String(formData.get("featureList") || "[]")); } catch {}
+      try {
+        blocks = JSON.parse(String(formData.get("blocks") || "[]"));
+      } catch {}
+      try {
+        featureList = JSON.parse(String(formData.get("featureList") || "[]"));
+      } catch {}
 
       if (!title) return { ok: false, error: "请填写标题" };
-      if (categoryIds.length < 1) return { ok: false, error: "至少选择一个分类" };
-      if (status !== "DRAFT" && status !== "PUBLISHED") return { ok: false, error: "无效的状态" };
+      if (categoryIds.length < 1)
+        return { ok: false, error: "至少选择一个分类" };
+      if (status !== "DRAFT" && status !== "PUBLISHED")
+        return { ok: false, error: "无效的状态" };
 
       await prisma.product.update({
         where: { id },
@@ -74,10 +95,13 @@ export default async function EditProductPage({
           subtitle,
           slug,
           status: status as "DRAFT" | "PUBLISHED",
-          publishedAt: status === "PUBLISHED" ? product!.publishedAt ?? new Date() : null,
+          publishedAt:
+            status === "PUBLISHED"
+              ? (product!.publishedAt ?? new Date())
+              : null,
           tags,
-          featureList,
-          blocks,
+          featureList: featureList as unknown as Prisma.InputJsonValue,
+          blocks: blocks as unknown as Prisma.InputJsonValue,
           coverMediaId,
           categoryIds: { set: categoryIds },
         },

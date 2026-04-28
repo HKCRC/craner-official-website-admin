@@ -101,9 +101,9 @@ model Product {
 }
 
 enum BannerLocale {
-  EN
-  ZH_HANS
-  ZH_HANT
+  en
+  zh
+  zh_hk
 }
 
 enum BannerTemplate {
@@ -129,6 +129,7 @@ model HomepageBanner {
 // media field: { type: "carousel", images: string[] } | { type: "video", url: string }
 model FeaturedProduct {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  locale      BannerLocale? @default(en)
   order       Int      @default(0)
   title       String   @default("")
   subtitle    String   @default("")
@@ -137,6 +138,8 @@ model FeaturedProduct {
   tags        String[]
   // { type: "carousel", images: string[] } | { type: "video", url: string }
   media       Json     @default("{\"type\":\"carousel\",\"images\":[]}")
+  // [{ label: string, value: string }] — same shape as Product.featureList
+  featureList Json     @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -175,4 +178,13 @@ model Media {
 
   coverForPosts    Post[]    @relation("PostCoverMedia")
   coverForProducts Product[] @relation("ProductCoverMedia")
+}
+
+// Generic key/value settings for the public site (managed in /admin/config).
+model AppConfig {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  val       String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

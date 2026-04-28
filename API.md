@@ -79,14 +79,14 @@
 
 ### 2) 获取单语言 Banner
 
-- **GET** ` /api/public/homepage-banner?locale=EN|ZH_HANS|ZH_HANT `
+- **GET** ` /api/public/homepage-banner?locale=EN|ZH|ZH-HK `
 - **Response**
   - `{ ok: true, banner: HomepageBanner }`
   - 找不到返回 `404`：`{ ok: false, error: "Not found" }`
 
 **HomepageBanner 数据结构（核心字段）**
 
-- `locale`: `"EN" | "ZH_HANS" | "ZH_HANT"`
+- `locale`: `"EN" | "ZH" | "ZH-HK"`
 - `template`: `"CAROUSEL" | "VIDEO"`
 - `content`：
   - `CAROUSEL`：`{ slides: Array<{ title: string; subtitle: string; imageUrl: string }> }`
@@ -106,14 +106,14 @@
 
 ### 2) 获取单语言 Contact Info
 
-- **GET** ` /api/public/contact-info?locale=EN|ZH_HANS|ZH_HANT `
+- **GET** ` /api/public/contact-info?locale=EN|ZH|ZH-HK `
 - **Response**
   - `{ ok: true, contact: ContactInfo }`
   - 找不到返回 `404`：`{ ok: false, error: "Not found" }`
 
 **ContactInfo 数据结构（核心字段）**
 
-- `locale`: `"EN" | "ZH_HANS" | "ZH_HANT"`
+- `locale`: `"EN" | "ZH" | "ZH-HK"`
 - `address1Region`, `address1Detail`
 - `address2Region`, `address2Detail`
 - `phone`, `email`

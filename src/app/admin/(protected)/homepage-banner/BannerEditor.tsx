@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-type Locale = "EN" | "ZH_HANS" | "ZH_HANT";
+type Locale = "en" | "zh" | "zh-hk";
 type Template = "CAROUSEL" | "VIDEO";
 
 interface CarouselSlide {
   title: string;
   subtitle: string;
   imageUrl: string;
+  link?: string;
 }
 
 interface CarouselContent {
@@ -20,6 +21,7 @@ interface VideoContent {
   title: string;
   subtitle: string;
   videoUrl: string;
+  link?: string;
 }
 
 type BannerContent = CarouselContent | VideoContent;
@@ -31,9 +33,9 @@ interface BannerData {
 }
 
 const LOCALES: { key: Locale; label: string }[] = [
-  { key: "EN", label: "Index - EN" },
-  { key: "ZH_HANS", label: "首页 - 简中" },
-  { key: "ZH_HANT", label: "首頁 - 繁中" },
+  { key: "en", label: "Index - EN" },
+  { key: "zh", label: "首页 - 简中" },
+  { key: "zh-hk", label: "首頁 - 繁中" },
 ];
 
 const emptyCarousel = (): CarouselContent => ({ slides: [] });
@@ -56,16 +58,16 @@ function defaultContent(template: Template): BannerContent {
 }
 
 export default function BannerEditor() {
-  const [activeLocale, setActiveLocale] = useState<Locale>("EN");
+  const [activeLocale, setActiveLocale] = useState<Locale>("en");
   const [data, setData] = useState<Record<Locale, BannerData>>({
-    EN: { locale: "EN", template: "CAROUSEL", content: emptyCarousel() },
-    ZH_HANS: {
-      locale: "ZH_HANS",
+    en: { locale: "en", template: "CAROUSEL", content: emptyCarousel() },
+    zh: {
+      locale: "zh",
       template: "CAROUSEL",
       content: emptyCarousel(),
     },
-    ZH_HANT: {
-      locale: "ZH_HANT",
+    "zh-hk": {
+      locale: "zh-hk",
       template: "CAROUSEL",
       content: emptyCarousel(),
     },
@@ -84,8 +86,11 @@ export default function BannerEditor() {
         "Content-Type": "application/json",
       },
     })
-      .then((r) => {
-        console.log(r);
+      .then(async (r) => {
+        if (!r.ok) {
+          const text = await r.text().catch(() => "");
+          throw new Error(text || `Request failed (${r.status})`);
+        }
         return r.json();
       })
       .then(({ banners }: { banners: BannerData[] }) => {
@@ -97,6 +102,9 @@ export default function BannerEditor() {
           }
           return next;
         });
+      })
+      .catch((e) => {
+        console.error(e);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -124,7 +132,7 @@ export default function BannerEditor() {
       content: {
         slides: [
           ...current.content.slides,
-          { title: "", subtitle: "", imageUrl: "" },
+        { title: "", subtitle: "", imageUrl: "", link: "" },
         ],
       },
     });
@@ -384,6 +392,18 @@ function CarouselEditor({
             </div>
           </div>
 
+          <div className="space-y-1">
+            <label className="text-xs text-zinc-500 font-medium">
+              点击跳转链接 Link（可选）
+            </label>
+            <input
+              className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+              value={slide.link ?? ""}
+              onChange={(e) => onPatch(idx, { link: e.target.value })}
+              placeholder="https://example.com"
+            />
+          </div>
+
           <div className="space-y-2">
             <label className="text-xs text-zinc-500 font-medium">
               图片 Image
@@ -502,6 +522,18 @@ function VideoEditor({
         <p className="text-xs text-zinc-400">
           支持 MP4 / YouTube embed / Vimeo embed 链接
         </p>
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-zinc-500 font-medium">
+          点击跳转链接 Link（可选）
+        </label>
+        <input
+          className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+          value={content.link ?? ""}
+          onChange={(e) => onPatch({ link: e.target.value })}
+          placeholder="https://example.com"
+        />
       </div>
 
       {content.videoUrl && (

@@ -13,9 +13,19 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const page = clampInt(url.searchParams.get("page"), 1, 1, 10_000);
   const pageSize = clampInt(url.searchParams.get("pageSize"), 20, 5, 100);
+  const category = url.searchParams.get("category");
+
+  const categoryId = category
+    ? await prisma.category
+        .findUnique({ where: { slug: category }, select: { id: true } })
+        .then((c) => c?.id ?? null)
+    : null;
 
   // Public API: only published products
-  const where = { status: "PUBLISHED" as const };
+  const where = {
+    status: "PUBLISHED" as const,
+    ...(categoryId ? { categoryIds: { has: categoryId } } : {}),
+  };
   const skip = (page - 1) * pageSize;
 
   const [total, items] = await Promise.all([
@@ -34,7 +44,10 @@ export async function GET(req: Request) {
         publishedAt: true,
         updatedAt: true,
         coverMedia: { select: { url: true } },
-        categories: { select: { name: true, slug: true } },
+        categories: {
+          select: { name: true, slug: true },
+          where: category ? { slug: category } : undefined,
+        },
         featureList: true,
       },
     }),

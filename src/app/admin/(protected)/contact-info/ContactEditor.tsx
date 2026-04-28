@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-type Locale = "EN" | "ZH_HANS" | "ZH_HANT";
+type Locale = "en" | "zh" | "zh-hk";
 
 interface QrCode {
   label: string;
@@ -28,9 +28,9 @@ interface ContactData {
 }
 
 const LOCALES: { key: Locale; label: string }[] = [
-  { key: "EN", label: "Contact - EN" },
-  { key: "ZH_HANS", label: "联系方式 - 简中" },
-  { key: "ZH_HANT", label: "聯繫方式 - 繁中" },
+  { key: "en", label: "Contact - EN" },
+  { key: "zh", label: "联系方式 - 简中" },
+  { key: "zh-hk", label: "聯繫方式 - 繁中" },
 ];
 
 function emptyContact(locale: Locale): ContactData {
@@ -48,15 +48,17 @@ function emptyContact(locale: Locale): ContactData {
 }
 
 export default function ContactEditor() {
-  const [activeLocale, setActiveLocale] = useState<Locale>("EN");
+  const [activeLocale, setActiveLocale] = useState<Locale>("en");
   const [data, setData] = useState<Record<Locale, ContactData>>({
-    EN: emptyContact("EN"),
-    ZH_HANS: emptyContact("ZH_HANS"),
-    ZH_HANT: emptyContact("ZH_HANT"),
+    en: emptyContact("en"),
+    zh: emptyContact("zh"),
+    "zh-hk": emptyContact("zh-hk"),
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
   const [uploadingQr, setUploadingQr] = useState<number | null>(null);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function ContactEditor() {
         [activeLocale]: { ...prev[activeLocale], ...p },
       }));
     },
-    [activeLocale]
+    [activeLocale],
   );
 
   /* ── QR codes ── */
@@ -105,7 +107,10 @@ export default function ContactEditor() {
     const fd = new FormData();
     fd.append("file", file);
     try {
-      const res = await fetch("/api/media/upload", { method: "POST", body: fd });
+      const res = await fetch("/api/media/upload", {
+        method: "POST",
+        body: fd,
+      });
       const json = await res.json();
       if (json.ok) patchQr(idx, { imageUrl: json.media.url });
     } finally {
@@ -125,7 +130,7 @@ export default function ContactEditor() {
   function patchSocial(idx: number, p: Partial<SocialLink>) {
     patch({
       socialLinks: current.socialLinks.map((s, i) =>
-        i === idx ? { ...s, ...p } : s
+        i === idx ? { ...s, ...p } : s,
       ),
     });
   }
@@ -275,7 +280,12 @@ export default function ContactEditor() {
                       <span>上传中…</span>
                     ) : (
                       <>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
                           <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                         </svg>
                         <span>点击上传二维码图片</span>
@@ -337,7 +347,12 @@ export default function ContactEditor() {
                 className="shrink-0 rounded-md border px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition"
                 title="删除"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                 </svg>
               </button>
@@ -369,7 +384,9 @@ export default function ContactEditor() {
           <span className="text-sm text-green-600 font-medium">✓ 已保存</span>
         )}
         {saveStatus === "error" && (
-          <span className="text-sm text-red-600 font-medium">保存失败，请重试</span>
+          <span className="text-sm text-red-600 font-medium">
+            保存失败，请重试
+          </span>
         )}
       </div>
     </div>

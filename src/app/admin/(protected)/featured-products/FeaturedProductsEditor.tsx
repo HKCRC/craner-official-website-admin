@@ -2,14 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import type { FeatureItem } from "@/types/product";
 
 /* ── Types ── */
+type Locale = "en" | "zh" | "zh-hk";
 type MediaCarousel = { type: "carousel"; images: string[] };
 type MediaVideo = { type: "video"; url: string };
 type Media = MediaCarousel | MediaVideo;
 
 interface FeaturedProduct {
   id: string;
+  locale: Locale;
   order: number;
   title: string;
   subtitle: string;
@@ -17,12 +20,14 @@ interface FeaturedProduct {
   productName: string;
   tags: string[];
   media: Media;
+  featureList: FeatureItem[];
 }
 
 type DraftProduct = Omit<FeaturedProduct, "id"> & { id?: string };
 
 function emptyProduct(order: number): DraftProduct {
   return {
+    locale: "en",
     order,
     title: "",
     subtitle: "",
@@ -30,7 +35,17 @@ function emptyProduct(order: number): DraftProduct {
     productName: "",
     tags: [],
     media: { type: "carousel", images: [] },
+    featureList: [],
   };
+}
+
+function parseFeatureList(raw: unknown): FeatureItem[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((x) => {
+    if (!x || typeof x !== "object") return { label: "", value: "" };
+    const o = x as Record<string, unknown>;
+    return { label: String(o.label ?? ""), value: String(o.value ?? "") };
+  });
 }
 
 /* ── Main editor ── */
@@ -42,8 +57,15 @@ export default function FeaturedProductsEditor() {
   useEffect(() => {
     fetch("/api/featured-products")
       .then((r) => r.json())
-      .then(({ items }) => {
-        if (items) setItems(items);
+      .then(({ items }: { items?: Record<string, unknown>[] }) => {
+        if (!items) return;
+        setItems(
+          items.map((it) => ({
+            ...(it as unknown as FeaturedProduct),
+            locale: (it.locale as Locale) ?? "en",
+            featureList: parseFeatureList(it.featureList),
+          })),
+        );
       })
       .finally(() => setLoading(false));
   }, []);
@@ -68,19 +90,27 @@ export default function FeaturedProductsEditor() {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        locale: draft.locale,
         title: draft.title,
         subtitle: draft.subtitle,
         description: draft.description,
         productName: draft.productName,
         tags: draft.tags,
         media: draft.media,
+        featureList: draft.featureList,
         order: draft.order,
       }),
     });
     const json = await res.json();
     if (json.ok) {
-      setItems((prev) => prev.map((p) => (p.id === draft.id ? json.item : p)));
-      setExpandedId(json.item.id);
+      const saved = json.item as Record<string, unknown>;
+      const normalized: FeaturedProduct = {
+        ...(saved as unknown as FeaturedProduct),
+        locale: (saved.locale as Locale) ?? "en",
+        featureList: parseFeatureList(saved.featureList),
+      };
+      setItems((prev) => prev.map((p) => (p.id === draft.id ? normalized : p)));
+      setExpandedId(normalized.id);
     }
     return json.ok;
   }
@@ -195,7 +225,18 @@ function ProductCard({
             )}
           </div>
           {item.title && item.productName && (
-            <div className="text-xs text-zinc-400 truncate">{item.title}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-zinc-400 truncate">{item.title}</div>
+              <span className="text-xs text-zinc-400 truncate">|</span>
+              <div className="text-xs text-zinc-400 truncate">
+                语言:{" "}
+                {item.locale === "en"
+                  ? "English"
+                  : item.locale === "zh"
+                    ? "中文"
+                    : "繁体中文"}
+              </div>
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -228,6 +269,17 @@ function ProductCard({
         <div className="border-t px-5 py-5 space-y-5">
           {/* Basic fields */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Field label="语言 Locale">
+              <select
+                className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+                value={item.locale}
+                onChange={(e) => onChange({ locale: e.target.value as Locale })}
+              >
+                <option value="en">en</option>
+                <option value="zh">zh</option>
+                <option value="zh-hk">zh-hk</option>
+              </select>
+            </Field>
             <Field label="产品名 Product Name">
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -278,6 +330,20 @@ function ProductCard({
             </Field>
           </div>
 
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 space-y-3">
+            <div>
+              <div className="font-semibold text-sm">Feature list</div>
+              <div className="text-xs text-zinc-500">
+                e.g. &quot;AI 准确度&quot; /
+                &quot;90%&quot;，将展示在精选产品特性区域
+              </div>
+            </div>
+            <FeatureListEditor
+              items={item.featureList}
+              onChange={(featureList) => onChange({ featureList })}
+            />
+          </div>
+
           {/* Media section */}
           <MediaEditor
             media={item.media}
@@ -316,6 +382,62 @@ function ProductCard({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function FeatureListEditor({
+  items,
+  onChange,
+}: {
+  items: FeatureItem[];
+  onChange: (v: FeatureItem[]) => void;
+}) {
+  function update(index: number, field: keyof FeatureItem, val: string) {
+    const next = items.map((row, i) =>
+      i === index ? { ...row, [field]: val } : row,
+    );
+    onChange(next);
+  }
+  function remove(index: number) {
+    onChange(items.filter((_, i) => i !== index));
+  }
+  function add() {
+    onChange([...items, { label: "", value: "" }]);
+  }
+
+  return (
+    <div className="space-y-2">
+      {items.map((row, i) => (
+        <div key={i} className="flex gap-2 items-center">
+          <input
+            className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+            placeholder="标签 e.g. AI准确度"
+            value={row.label}
+            onChange={(e) => update(i, "label", e.target.value)}
+          />
+          <input
+            className="w-32 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+            placeholder="数值 e.g. 90%"
+            value={row.value}
+            onChange={(e) => update(i, "value", e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => remove(i)}
+            className="text-red-400 hover:text-red-700 px-1"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={add}
+        className="text-sm text-zinc-500 hover:text-black underline underline-offset-2"
+      >
+        + 添加一行
+      </button>
     </div>
   );
 }

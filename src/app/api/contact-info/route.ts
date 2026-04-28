@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { fromDbBannerLocale, toDbBannerLocale } from "@/lib/banner-locale";
 
 export const runtime = "nodejs";
 
-const LocaleEnum = z.enum(["EN", "ZH_HANS", "ZH_HANT"]);
+const LocaleEnum = z.enum(["en", "zh", "zh-hk"]);
 
 const QrCodeSchema = z.object({
   label: z.string(),
@@ -37,7 +38,10 @@ export async function GET() {
     orderBy: { locale: "asc" },
   });
 
-  return NextResponse.json({ ok: true, contacts });
+  return NextResponse.json({
+    ok: true,
+    contacts: contacts.map((c) => ({ ...c, locale: fromDbBannerLocale(c.locale) })),
+  });
 }
 
 export async function POST(req: Request) {
@@ -56,10 +60,13 @@ export async function POST(req: Request) {
   const { locale, ...data } = parsed.data;
 
   const contact = await prisma.contactInfo.upsert({
-    where: { locale },
-    create: { locale, ...data },
+    where: { locale: toDbBannerLocale(locale) },
+    create: { locale: toDbBannerLocale(locale), ...data },
     update: data,
   });
 
-  return NextResponse.json({ ok: true, contact });
+  return NextResponse.json({
+    ok: true,
+    contact: { ...contact, locale: fromDbBannerLocale(contact.locale) },
+  });
 }

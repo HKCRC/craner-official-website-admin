@@ -2,22 +2,25 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { fromDbBannerLocale, toDbBannerLocale } from "@/lib/banner-locale";
 
 export const runtime = "nodejs";
 
-const LocaleEnum = z.enum(["EN", "ZH_HANS", "ZH_HANT"]);
+const LocaleEnum = z.enum(["en", "zh", "zh-hk"]);
 const TemplateEnum = z.enum(["CAROUSEL", "VIDEO"]);
 
 const CarouselSlideSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
   imageUrl: z.string(),
+  link: z.string().optional().default(""),
 });
 
 const VideoContentSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
   videoUrl: z.string(),
+  link: z.string().optional().default(""),
 });
 
 const BodySchema = z.object({
@@ -37,7 +40,10 @@ export async function GET() {
     orderBy: { locale: "asc" },
   });
 
-  return NextResponse.json({ ok: true, banners });
+  return NextResponse.json({
+    ok: true,
+    banners: banners.map((b) => ({ ...b, locale: fromDbBannerLocale(b.locale) })),
+  });
 }
 
 export async function POST(req: Request) {
@@ -53,10 +59,13 @@ export async function POST(req: Request) {
   const { locale, template, content } = parsed.data;
 
   const banner = await prisma.homepageBanner.upsert({
-    where: { locale },
-    create: { locale, template, content },
+    where: { locale: toDbBannerLocale(locale) },
+    create: { locale: toDbBannerLocale(locale), template, content },
     update: { template, content },
   });
 
-  return NextResponse.json({ ok: true, banner });
+  return NextResponse.json({
+    ok: true,
+    banner: { ...banner, locale: fromDbBannerLocale(banner.locale) },
+  });
 }

@@ -14,25 +14,14 @@ export async function GET(req: Request) {
   const page = clampInt(url.searchParams.get("page"), 1, 1, 10_000);
   const pageSize = clampInt(url.searchParams.get("pageSize"), 20, 5, 100);
   const category = url.searchParams.get("category");
+  
+  console.error("category", category);
 
   const categoryId = category
     ? await prisma.category
         .findUnique({ where: { slug: category }, select: { id: true } })
         .then((c) => c?.id ?? null)
     : null;
-
-  // If caller specifies a category slug that doesn't exist, return empty results
-  // instead of returning unrelated products with empty `categories` arrays.
-  if (category && !categoryId) {
-    return NextResponse.json({
-      ok: true,
-      page,
-      pageSize,
-      total: 0,
-      totalPages: 1,
-      items: [],
-    });
-  }
 
   // Public API: only published products
   const where = {

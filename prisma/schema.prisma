@@ -44,8 +44,8 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  postIds    String[] @db.ObjectId
-  posts      Post[]   @relation(fields: [postIds], references: [id])
+  postIds String[] @db.ObjectId
+  posts   Post[]   @relation(fields: [postIds], references: [id])
 
   productIds String[]  @db.ObjectId
   products   Product[] @relation(fields: [productIds], references: [id])
@@ -128,40 +128,40 @@ model HomepageBanner {
 // FeaturedProduct: a manually-curated product card shown on the homepage/feature section.
 // media field: { type: "carousel", images: string[] } | { type: "video", url: string }
 model FeaturedProduct {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
   locale      BannerLocale? @default(en)
-  order       Int      @default(0)
-  title       String   @default("")
-  subtitle    String   @default("")
-  description String   @default("")
-  productName String   @default("")
+  order       Int           @default(0)
+  title       String        @default("")
+  subtitle    String        @default("")
+  description String        @default("")
+  productName String        @default("")
   tags        String[]
   // { type: "carousel", images: string[] } | { type: "video", url: string }
-  media       Json     @default("{\"type\":\"carousel\",\"images\":[]}")
+  media       Json          @default("{\"type\":\"carousel\",\"images\":[]}")
   // [{ label: string, value: string }] — same shape as Product.featureList
-  featureList Json     @default("[]")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  featureList Json          @default("[]")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 // ContactInfo stores contact page configuration per locale.
 // qrCodes:      [{label:string, imageUrl:string}]
 // socialLinks:  [{platform:string, url:string}]
 model ContactInfo {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  locale      BannerLocale @unique
-  address1Region  String   @default("")
-  address1Detail  String   @default("")
-  address2Region  String   @default("")
-  address2Detail  String   @default("")
-  phone       String       @default("")
-  email       String       @default("")
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  locale         BannerLocale @unique
+  address1Region String       @default("")
+  address1Detail String       @default("")
+  address2Region String       @default("")
+  address2Detail String       @default("")
+  phone          String       @default("")
+  email          String       @default("")
   // [{label:string, imageUrl:string}]
-  qrCodes     Json         @default("[]")
+  qrCodes        Json         @default("[]")
   // [{platform:string, url:string}]
-  socialLinks Json         @default("[]")
-  updatedAt   DateTime     @updatedAt
-  createdAt   DateTime     @default(now())
+  socialLinks    Json         @default("[]")
+  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime     @default(now())
 }
 
 model Media {

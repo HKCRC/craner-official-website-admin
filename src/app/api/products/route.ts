@@ -21,6 +21,19 @@ export async function GET(req: Request) {
         .then((c) => c?.id ?? null)
     : null;
 
+  // If caller specifies a category slug that doesn't exist, return empty results
+  // instead of returning unrelated products with empty `categories` arrays.
+  if (category && !categoryId) {
+    return NextResponse.json({
+      ok: true,
+      page,
+      pageSize,
+      total: 0,
+      totalPages: 1,
+      items: [],
+    });
+  }
+
   // Public API: only published products
   const where = {
     status: "PUBLISHED" as const,

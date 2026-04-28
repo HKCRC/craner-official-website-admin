@@ -132,7 +132,7 @@ export default function BannerEditor() {
       content: {
         slides: [
           ...current.content.slides,
-        { title: "", subtitle: "", imageUrl: "", link: "" },
+          { title: "", subtitle: "", imageUrl: "", link: "" },
         ],
       },
     });

@@ -27,6 +27,7 @@ services:
       DATABASE_URL: mongodb://mongo:27017/craner_cms?replicaSet=rs0&directConnection=true
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (same directory as docker-compose.yml)}
       SUPERADMIN_ACCESS_KEY: ${SUPERADMIN_ACCESS_KEY:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     volumes:
       - uploads_data:/app/public/uploads
     depends_on:

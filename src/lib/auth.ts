@@ -6,6 +6,13 @@ import { prisma } from "@/lib/prisma";
 
 const TOKEN_COOKIE = "cms_token";
 
+function getCookieSecure() {
+  const cookieSecure = process.env.COOKIE_SECURE?.toLowerCase();
+  if (cookieSecure === "true") return true;
+  if (cookieSecure === "false") return false;
+  return process.env.NODE_ENV === "production";
+}
+
 function getJwtSecretKey() {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("Missing JWT_SECRET");
@@ -39,7 +46,7 @@ export async function setSessionCookie(token: string) {
   cookieStore.set(TOKEN_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: getCookieSecure(),
     path: "/",
   });
 }
@@ -49,7 +56,7 @@ export async function clearSessionCookie() {
   cookieStore.set(TOKEN_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: getCookieSecure(),
     path: "/",
     maxAge: 0,
   });

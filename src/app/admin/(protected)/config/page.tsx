@@ -96,7 +96,7 @@ export default async function AdminConfigPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Config</h1>
+        <h1 className="text-2xl font-semibold">站点配置</h1>
         <p className="text-sm text-zinc-600 mt-1">通用键值配置</p>
       </div>
 

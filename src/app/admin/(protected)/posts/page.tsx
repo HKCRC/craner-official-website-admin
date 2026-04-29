@@ -56,27 +56,33 @@ export default async function PostsPage({
 
   const makeHref = (p: number) => `/admin/posts?page=${p}&pageSize=${pageSize}`;
 
+  function statusLabel(s: string) {
+    if (s === "PUBLISHED") return "已发布";
+    if (s === "DRAFT") return "草稿";
+    return s;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Posts</h1>
+          <h1 className="text-2xl font-semibold">文章</h1>
           <p className="text-sm text-zinc-600">
-            Create and publish articles. Total: {total}
+            创建与发布文章。共 {total} 篇
           </p>
         </div>
         <Link
           className="rounded-md bg-black px-4 py-2 text-white font-medium"
           href="/admin/posts/new"
         >
-          New post
+          新建文章
         </Link>
       </div>
 
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm text-zinc-600">
-          Page <span className="font-medium text-black">{safePage}</span> /{" "}
-          {totalPages}
+          第 <span className="font-medium text-black">{safePage}</span> /{" "}
+          {totalPages} 页
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -86,7 +92,7 @@ export default async function PostsPage({
               prevPage ? "hover:bg-zinc-50" : "pointer-events-none opacity-50"
             }`}
           >
-            Prev
+            上一页
           </Link>
           <Link
             href={nextPage ? makeHref(nextPage) : "#"}
@@ -95,7 +101,7 @@ export default async function PostsPage({
               nextPage ? "hover:bg-zinc-50" : "pointer-events-none opacity-50"
             }`}
           >
-            Next
+            下一页
           </Link>
         </div>
       </div>
@@ -104,11 +110,11 @@ export default async function PostsPage({
         <table className="w-full text-sm">
           <thead className="bg-zinc-50 text-zinc-600">
             <tr>
-              <th className="text-left font-medium px-5 py-3">Title</th>
+              <th className="text-left font-medium px-5 py-3">标题</th>
               <th className="text-left font-medium px-5 py-3">Slug</th>
-              <th className="text-left font-medium px-5 py-3">Status</th>
-              <th className="text-left font-medium px-5 py-3">Categories</th>
-              <th className="text-right font-medium px-5 py-3">Actions</th>
+              <th className="text-left font-medium px-5 py-3">状态</th>
+              <th className="text-left font-medium px-5 py-3">分类</th>
+              <th className="text-right font-medium px-5 py-3">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -119,7 +125,7 @@ export default async function PostsPage({
                   <div className="text-xs text-zinc-500">{p.author.email}</div>
                 </td>
                 <td className="px-5 py-3 text-zinc-600">{p.slug}</td>
-                <td className="px-5 py-3">{p.status}</td>
+                <td className="px-5 py-3">{statusLabel(p.status)}</td>
                 <td className="px-5 py-3">
                   <div className="flex flex-wrap gap-1">
                     {p.categories.map((c, idx) => (
@@ -137,7 +143,7 @@ export default async function PostsPage({
                     className="rounded-md border px-3 py-1.5 hover:bg-zinc-50"
                     href={`/admin/posts/${p.id}/edit`}
                   >
-                    Edit
+                    编辑
                   </Link>
                 </td>
               </tr>
@@ -145,7 +151,7 @@ export default async function PostsPage({
             {posts.length === 0 ? (
               <tr>
                 <td className="px-5 py-6 text-zinc-600" colSpan={5}>
-                  No posts yet.
+                  暂无文章。
                 </td>
               </tr>
             ) : null}
@@ -155,15 +161,15 @@ export default async function PostsPage({
 
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm text-zinc-600">
-          Showing{" "}
+          显示第{" "}
           <span className="font-medium text-black">
             {total === 0 ? 0 : skip + 1}
-          </span>{" "}
-          -{" "}
+          </span>
+          {" "}–{" "}
           <span className="font-medium text-black">
             {Math.min(skip + pageSize, total)}
-          </span>{" "}
-          of {total}
+          </span>
+          {" "}条，共 {total} 条
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -173,7 +179,7 @@ export default async function PostsPage({
               prevPage ? "hover:bg-zinc-50" : "pointer-events-none opacity-50"
             }`}
           >
-            Prev
+            上一页
           </Link>
           <Link
             href={nextPage ? makeHref(nextPage) : "#"}
@@ -182,7 +188,7 @@ export default async function PostsPage({
               nextPage ? "hover:bg-zinc-50" : "pointer-events-none opacity-50"
             }`}
           >
-            Next
+            下一页
           </Link>
         </div>
       </div>

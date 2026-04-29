@@ -132,7 +132,7 @@ export default function FeaturedProductsEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-40 text-zinc-400">
-        Loading…
+        加载中…
       </div>
     );
   }
@@ -167,7 +167,7 @@ export default function FeaturedProductsEditor() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
-        添加产品 / Add Product
+        添加精选产品
       </button>
     </div>
   );
@@ -231,9 +231,9 @@ function ProductCard({
               <div className="text-xs text-zinc-400 truncate">
                 语言:{" "}
                 {item.locale === "en"
-                  ? "English"
+                  ? "英语"
                   : item.locale === "zh"
-                    ? "中文"
+                    ? "简体中文"
                     : "繁体中文"}
               </div>
             </div>
@@ -269,7 +269,7 @@ function ProductCard({
         <div className="border-t px-5 py-5 space-y-5">
           {/* Basic fields */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Field label="语言 Locale">
+            <Field label="语言（en / zh / zh-hk）">
               <select
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.locale}
@@ -280,7 +280,7 @@ function ProductCard({
                 <option value="zh-hk">zh-hk</option>
               </select>
             </Field>
-            <Field label="产品名 Product Name">
+            <Field label="产品名称">
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.productName}
@@ -288,7 +288,7 @@ function ProductCard({
                 placeholder="产品名称"
               />
             </Field>
-            <Field label="大标题 Title">
+            <Field label="大标题">
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.title}
@@ -296,7 +296,7 @@ function ProductCard({
                 placeholder="展示标题"
               />
             </Field>
-            <Field label="小标题 Subtitle">
+            <Field label="小标题">
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.subtitle}
@@ -304,7 +304,7 @@ function ProductCard({
                 placeholder="副标题"
               />
             </Field>
-            <Field label="标签 Tags（逗号分隔）">
+            <Field label="标签（逗号分隔）">
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 value={item.tags.join(", ")}
@@ -319,7 +319,7 @@ function ProductCard({
                 placeholder="AI, 医疗, SaaS"
               />
             </Field>
-            <Field label="描述 Description" className="md:col-span-2">
+            <Field label="描述" className="md:col-span-2">
               <textarea
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 resize-none"
                 rows={3}
@@ -332,7 +332,7 @@ function ProductCard({
 
           <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 space-y-3">
             <div>
-              <div className="font-semibold text-sm">Feature list</div>
+              <div className="font-semibold text-sm">特性列表</div>
               <div className="text-xs text-zinc-500">
                 e.g. &quot;AI 准确度&quot; /
                 &quot;90%&quot;，将展示在精选产品特性区域
@@ -358,7 +358,7 @@ function ProductCard({
               }}
               className="text-sm text-red-500 hover:text-red-700 transition"
             >
-              删除 / Delete
+              删除
             </button>
             <div className="flex items-center gap-3">
               {saveStatus === "success" && (
@@ -494,21 +494,21 @@ function MediaEditor({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-zinc-700">媒体 / Media</span>
+        <span className="text-sm font-medium text-zinc-700">展示媒体</span>
         <div className="flex gap-1 rounded-lg border p-0.5">
           <button
             type="button"
             onClick={() => onChange({ type: "carousel", images: [] })}
             className={`rounded-md px-3 py-1 text-xs font-medium transition ${media.type === "carousel" ? "bg-black text-white" : "text-zinc-500 hover:text-black"}`}
           >
-            轮播图 Carousel
+            轮播图
           </button>
           <button
             type="button"
             onClick={() => onChange({ type: "video", url: "" })}
             className={`rounded-md px-3 py-1 text-xs font-medium transition ${media.type === "video" ? "bg-black text-white" : "text-zinc-500 hover:text-black"}`}
           >
-            视频 Video
+            视频
           </button>
         </div>
       </div>
@@ -587,7 +587,7 @@ function MediaEditor({
       {/* Video */}
       {media.type === "video" && (
         <div className="space-y-3">
-          <Field label="视频地址 Video URL（填入链接或上传）">
+          <Field label="视频地址（链接或上传文件）">
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
               value={media.url}

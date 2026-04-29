@@ -101,7 +101,7 @@ export function ProductNewForm({ categories, media, defaultSlug, createAction }:
                   {categories.length === 0 ? (
                     <p className="text-xs text-zinc-400">
                       暂无分类，请先去{" "}
-                      <Link href="/admin/categories" className="underline">Categories</Link>{" "}
+                      <Link href="/admin/categories" className="underline">分类管理</Link>{" "}
                       创建。
                     </p>
                   ) : (

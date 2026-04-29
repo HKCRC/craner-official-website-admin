@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    hostname: mongo
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo_data:/data/db
+      - ./scripts/mongo-rs-health.sh:/mongo-rs-health.sh:ro
+    # Bind to loopback only; remove the ports block if nothing outside the stack should reach Mongo.
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: ["CMD", "sh", "/mongo-rs-health.sh"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 90s
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "6999:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://mongo:27017/craner_cms?replicaSet=rs0&directConnection=true
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (same directory as docker-compose.yml)}
+      SUPERADMIN_ACCESS_KEY: ${SUPERADMIN_ACCESS_KEY:-}
+    volumes:
+      - uploads_data:/app/public/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
+  uploads_data:

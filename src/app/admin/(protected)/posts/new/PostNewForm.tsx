@@ -30,18 +30,18 @@ export function PostNewForm({ categories, media, defaultSlug, createAction }: Pr
       <div className="space-y-6">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-semibold">New post</h1>
-            <p className="text-sm text-zinc-600">Write with the rich text editor and publish.</p>
+            <h1 className="text-2xl font-semibold">新建文章</h1>
+            <p className="text-sm text-zinc-600">使用富文本编辑器撰写并发布。</p>
           </div>
           <Link className="rounded-md border px-3 py-1.5 hover:bg-zinc-50" href="/admin/posts">
-            Back
+            返回
           </Link>
         </div>
 
         <form action={formAction} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Title</span>
+              <span className="text-sm font-medium">标题</span>
               <input className="w-full rounded-md border px-3 py-2" name="title" required />
             </label>
             <label className="block space-y-1">
@@ -56,15 +56,15 @@ export function PostNewForm({ categories, media, defaultSlug, createAction }: Pr
               </span>
             </label>
             <label className="block space-y-1 md:col-span-2">
-              <span className="text-sm font-medium">Excerpt (optional)</span>
+              <span className="text-sm font-medium">摘要（选填）</span>
               <input className="w-full rounded-md border px-3 py-2" name="excerpt" />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">客户 / 伙伴 Client (optional)</span>
+              <span className="text-sm font-medium">客户 / 伙伴（选填）</span>
               <input className="w-full rounded-md border px-3 py-2" name="client" placeholder="如：Apple、某合作方" />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">产品标签 Tags (optional, 逗号分隔)</span>
+              <span className="text-sm font-medium">标签（选填，逗号分隔）</span>
               <input className="w-full rounded-md border px-3 py-2" name="tags" placeholder="如：设计, 品牌, 包装" />
             </label>
           </div>
@@ -72,22 +72,22 @@ export function PostNewForm({ categories, media, defaultSlug, createAction }: Pr
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-xl border bg-white p-4 space-y-3 md:col-span-1">
               <div>
-                <div className="text-sm font-semibold">Meta</div>
-                <div className="text-xs text-zinc-600">Status, cover, categories</div>
+                <div className="text-sm font-semibold">发布设置</div>
+                <div className="text-xs text-zinc-600">状态、头图、分类</div>
               </div>
 
               <label className="block space-y-1">
-                <span className="text-sm font-medium">Status</span>
+                <span className="text-sm font-medium">状态</span>
                 <select className="w-full rounded-md border px-3 py-2" name="status" defaultValue="DRAFT">
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
+                  <option value="DRAFT">草稿</option>
+                  <option value="PUBLISHED">已发布</option>
                 </select>
               </label>
 
               <CoverImagePicker media={media} />
 
               <div className="space-y-2">
-                <div className="text-sm font-medium">Categories (min 1)</div>
+                <div className="text-sm font-medium">分类（至少 1 个）</div>
                 <div className="space-y-1">
                   {categories.map((c) => (
                     <label key={c.id} className="flex items-center gap-2 text-sm">
@@ -97,8 +97,9 @@ export function PostNewForm({ categories, media, defaultSlug, createAction }: Pr
                   ))}
                   {categories.length === 0 && (
                     <div className="text-xs text-zinc-600">
-                      No categories yet.{" "}
-                      <Link className="underline" href="/admin/categories">Create one first.</Link>
+                      暂无分类，请先到{" "}
+                      <Link className="underline" href="/admin/categories">分类</Link>
+                      中创建。
                     </div>
                   )}
                 </div>
@@ -108,12 +109,12 @@ export function PostNewForm({ categories, media, defaultSlug, createAction }: Pr
                 disabled={pending}
                 className="w-full rounded-md bg-black px-4 py-2 text-white font-medium disabled:opacity-50"
               >
-                {pending ? "创建中…" : "Create post"}
+                {pending ? "创建中…" : "创建文章"}
               </button>
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <div className="text-sm font-semibold">Content</div>
+              <div className="text-sm font-semibold">正文</div>
               <RichEditorField name="content" media={media} />
             </div>
           </div>

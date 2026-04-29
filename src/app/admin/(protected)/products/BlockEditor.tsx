@@ -80,7 +80,7 @@ function Field({
 function ImageFields({
   img,
   onChange,
-  label = "Image",
+  label = "图片",
   mediaItems,
 }: {
   img: BlockImage;
@@ -191,7 +191,7 @@ function ImageFields({
 function ImagesFields({
   images,
   onChange,
-  label = "Images",
+  label = "图片（多张）",
   mediaItems,
 }: {
   images: BlockImage[];
@@ -677,9 +677,9 @@ export function BlockEditor({
       {/* ── Feature list section ── */}
       <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-3">
         <div>
-          <div className="font-semibold text-sm">Feature List</div>
+          <div className="font-semibold text-sm">特性列表</div>
           <div className="text-xs text-zinc-500">
-            e.g. &quot;AI 准确度&quot; / &quot;90%&quot;，将展示在产品页特性区域
+            例如「AI 准确度」/「90%」，将展示在产品页特性区域
           </div>
         </div>
         <FeatureListEditor items={features} onChange={setFeatures} />

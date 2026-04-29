@@ -31,20 +31,20 @@ export function MediaItemCard({ id, url, originalName, sizeBytes, mimeType }: Pr
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError("Could not copy");
+      setError("无法复制到剪贴板");
       setTimeout(() => setError(null), 2000);
     }
   }
 
   async function remove() {
-    if (!window.confirm(`Delete “${originalName}”?`)) return;
+    if (!window.confirm(`确定删除「${originalName}」？`)) return;
     setBusy(true);
     setError(null);
     const res = await fetch(`/api/media/${id}`, { method: "DELETE" });
     setBusy(false);
     if (!res.ok) {
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
-      setError(data?.error ?? "Delete failed");
+      setError(data?.error ?? "删除失败");
       return;
     }
     router.refresh();
@@ -71,7 +71,7 @@ export function MediaItemCard({ id, url, originalName, sizeBytes, mimeType }: Pr
             onClick={copyUrl}
             className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium text-zinc-800 hover:bg-zinc-50"
           >
-            {copied ? "Copied" : "Copy URL"}
+            {copied ? "已复制" : "复制链接"}
           </button>
           <button
             type="button"
@@ -79,7 +79,7 @@ export function MediaItemCard({ id, url, originalName, sizeBytes, mimeType }: Pr
             disabled={busy}
             className="rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100 disabled:opacity-50"
           >
-            {busy ? "Deleting…" : "Delete"}
+            {busy ? "删除中…" : "删除"}
           </button>
         </div>
       </div>

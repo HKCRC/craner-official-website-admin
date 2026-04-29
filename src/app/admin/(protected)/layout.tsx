@@ -62,47 +62,47 @@ export default async function ProtectedAdminLayout({
             href="/admin"
             className="text-base font-bold tracking-tight hover:opacity-80"
           >
-            Craner HK Admin
+            Craner 管理后台
           </Link>
         </div>
 
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5 text-sm">
           {[
-            { href: "/admin/posts", label: "Posts", icon: ICONS.posts },
+            { href: "/admin/posts", label: "文章", icon: ICONS.posts },
             {
               href: "/admin/products",
-              label: "Products",
+              label: "产品",
               icon: ICONS.products,
             },
             {
               href: "/admin/categories",
-              label: "Categories",
+              label: "分类",
               icon: ICONS.categories,
             },
-            { href: "/admin/media", label: "Media", icon: ICONS.media },
+            { href: "/admin/media", label: "媒体库", icon: ICONS.media },
             {
               href: "/admin/homepage-banner",
-              label: "Homepage Banner",
+              label: "首页 Banner",
               icon: ICONS.banner,
             },
             {
               href: "/admin/contact-info",
-              label: "Contact Info",
+              label: "联系方式",
               icon: ICONS.contact,
             },
             {
               href: "/admin/config",
-              label: "Config",
+              label: "站点配置",
               icon: ICONS.config,
             },
             {
               href: "/admin/featured-products",
-              label: "Featured Products",
+              label: "精选产品",
               icon: ICONS.featured,
             },
             ...(user.role === "SUPERADMIN"
-              ? [{ href: "/admin/users", label: "Users", icon: ICONS.users }]
+              ? [{ href: "/admin/users", label: "用户", icon: ICONS.users }]
               : []),
           ].map(({ href, label, icon }) => (
             <Link
@@ -122,7 +122,7 @@ export default async function ProtectedAdminLayout({
           <form action="/api/auth/logout" method="post">
             <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white">
               <NavIcon d={ICONS.logout} />
-              Logout
+              退出登录
             </button>
           </form>
         </div>

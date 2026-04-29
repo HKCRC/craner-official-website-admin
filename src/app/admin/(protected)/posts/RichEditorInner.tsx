@@ -97,7 +97,7 @@ export default function RichEditorInner({ name, initialHtml, media = [] }: Props
   if (!editor) {
     return (
       <div className="rounded-xl border bg-white p-6 text-sm text-zinc-400">
-        Loading editor…
+        编辑器加载中…
       </div>
     );
   }
@@ -109,40 +109,40 @@ export default function RichEditorInner({ name, initialHtml, media = [] }: Props
       {/* ── Toolbar ── */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-zinc-200 bg-zinc-50 px-2 py-1.5">
         {/* Text style */}
-        <ToolbarButton label="Bold" icon={ICONS.bold} active={editor.isActive("bold")}
+        <ToolbarButton label="粗体" icon={ICONS.bold} active={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()} />
-        <ToolbarButton label="Italic" icon={ICONS.italic} active={editor.isActive("italic")}
+        <ToolbarButton label="斜体" icon={ICONS.italic} active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()} />
-        <ToolbarButton label="Strikethrough" icon={ICONS.strike} active={editor.isActive("strike")}
+        <ToolbarButton label="删除线" icon={ICONS.strike} active={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()} />
 
         <Divider />
 
         {/* Headings */}
-        <ToolbarButton label="H1" icon={ICONS.h1} active={editor.isActive("heading", { level: 1 })}
+        <ToolbarButton label="标题1" icon={ICONS.h1} active={editor.isActive("heading", { level: 1 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} />
-        <ToolbarButton label="H2" icon={ICONS.h2} active={editor.isActive("heading", { level: 2 })}
+        <ToolbarButton label="标题2" icon={ICONS.h2} active={editor.isActive("heading", { level: 2 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
-        <ToolbarButton label="H3" icon={ICONS.h3} active={editor.isActive("heading", { level: 3 })}
+        <ToolbarButton label="标题3" icon={ICONS.h3} active={editor.isActive("heading", { level: 3 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
 
         <Divider />
 
         {/* Lists */}
-        <ToolbarButton label="Bullet list" icon={ICONS.ul} active={editor.isActive("bulletList")}
+        <ToolbarButton label="无序列表" icon={ICONS.ul} active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()} />
-        <ToolbarButton label="Numbered list" icon={ICONS.ol} active={editor.isActive("orderedList")}
+        <ToolbarButton label="有序列表" icon={ICONS.ol} active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()} />
-        <ToolbarButton label="Quote" icon={ICONS.quote} active={editor.isActive("blockquote")}
+        <ToolbarButton label="引用" icon={ICONS.quote} active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()} />
-        <ToolbarButton label="Code block" icon={ICONS.code} active={editor.isActive("codeBlock")}
+        <ToolbarButton label="代码块" icon={ICONS.code} active={editor.isActive("codeBlock")}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()} />
 
         <Divider />
 
         {/* Link */}
         <ToolbarButton
-          label="Add link"
+          label="插入链接"
           icon={ICONS.link}
           active={editor.isActive("link")}
           onClick={() => {
@@ -157,7 +157,7 @@ export default function RichEditorInner({ name, initialHtml, media = [] }: Props
           }}
         />
         <ToolbarButton
-          label="Remove link"
+          label="清除链接"
           icon={ICONS.unlink}
           disabled={!editor.isActive("link")}
           onClick={() => editor.chain().focus().unsetLink().run()}
@@ -167,7 +167,7 @@ export default function RichEditorInner({ name, initialHtml, media = [] }: Props
 
         {/* Image from media library */}
         <ToolbarButton
-          label="Insert image"
+          label="插入图片"
           icon={ICONS.image}
           onClick={() => setMediaOpen(true)}
         />
@@ -176,10 +176,10 @@ export default function RichEditorInner({ name, initialHtml, media = [] }: Props
         <span className="flex-1" />
 
         {/* Undo / Redo */}
-        <ToolbarButton label="Undo" icon={ICONS.undo}
+        <ToolbarButton label="撤销" icon={ICONS.undo}
           disabled={!editor.can().undo()}
           onClick={() => editor.chain().focus().undo().run()} />
-        <ToolbarButton label="Redo" icon={ICONS.redo}
+        <ToolbarButton label="重做" icon={ICONS.redo}
           disabled={!editor.can().redo()}
           onClick={() => editor.chain().focus().redo().run()} />
       </div>

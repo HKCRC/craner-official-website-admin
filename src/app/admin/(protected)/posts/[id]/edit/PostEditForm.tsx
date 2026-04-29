@@ -73,7 +73,7 @@ export function PostEditForm({
       <div className="space-y-6">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-semibold">Edit post</h1>
+            <h1 className="text-2xl font-semibold">编辑文章</h1>
             <p className="text-sm text-zinc-600">{post.id}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -81,11 +81,11 @@ export function PostEditForm({
               className="rounded-md border px-3 py-1.5 hover:bg-zinc-50"
               href="/admin/posts"
             >
-              Back
+              返回
             </Link>
             <form action={deleteAction}>
               <button className="rounded-md border px-3 py-1.5 hover:bg-zinc-50 text-red-700 border-red-200">
-                Delete
+                删除
               </button>
             </form>
           </div>
@@ -94,7 +94,7 @@ export function PostEditForm({
         <form action={formAction} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Title</span>
+              <span className="text-sm font-medium">标题</span>
               <input
                 className="w-full rounded-md border px-3 py-2"
                 name="title"
@@ -116,7 +116,7 @@ export function PostEditForm({
               </span>
             </label>
             <label className="block space-y-1 md:col-span-2">
-              <span className="text-sm font-medium">Excerpt (optional)</span>
+              <span className="text-sm font-medium">摘要（选填）</span>
               <input
                 className="w-full rounded-md border px-3 py-2"
                 name="excerpt"
@@ -125,7 +125,7 @@ export function PostEditForm({
             </label>
             <label className="block space-y-1">
               <span className="text-sm font-medium">
-                客户 / 伙伴 Client (optional)
+                客户 / 伙伴（选填）
               </span>
               <input
                 className="w-full rounded-md border px-3 py-2"
@@ -136,7 +136,7 @@ export function PostEditForm({
             </label>
             <label className="block space-y-1">
               <span className="text-sm font-medium">
-                产品标签 Tags (optional, 逗号分隔)
+                标签（选填，逗号分隔）
               </span>
               <input
                 className="w-full rounded-md border px-3 py-2"
@@ -150,21 +150,21 @@ export function PostEditForm({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-xl border bg-white p-4 space-y-3 md:col-span-1">
               <div>
-                <div className="text-sm font-semibold">Meta</div>
+                <div className="text-sm font-semibold">发布设置</div>
                 <div className="text-xs text-zinc-600">
-                  Status, cover, categories
+                  状态、头图、分类
                 </div>
               </div>
 
               <label className="block space-y-1">
-                <span className="text-sm font-medium">Status</span>
+                <span className="text-sm font-medium">状态</span>
                 <select
                   className="w-full rounded-md border px-3 py-2"
                   name="status"
                   defaultValue={post.status}
                 >
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
+                  <option value="DRAFT">草稿</option>
+                  <option value="PUBLISHED">已发布</option>
                 </select>
               </label>
 
@@ -174,7 +174,7 @@ export function PostEditForm({
               />
 
               <div className="space-y-2">
-                <div className="text-sm font-medium">Categories (min 1)</div>
+                <div className="text-sm font-medium">分类（至少 1 个）</div>
                 <div className="space-y-1">
                   {categories.map((c) => (
                     <label
@@ -197,12 +197,12 @@ export function PostEditForm({
                 disabled={pending}
                 className="w-full rounded-md bg-black px-4 py-2 text-white font-medium disabled:opacity-50"
               >
-                {pending ? "保存中…" : "Save"}
+                {pending ? "保存中…" : "保存"}
               </button>
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <div className="text-sm font-semibold">Content</div>
+              <div className="text-sm font-semibold">正文</div>
               <RichEditorField
                 name="content"
                 initialHtml={initialHtml}

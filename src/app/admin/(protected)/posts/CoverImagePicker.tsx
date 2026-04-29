@@ -35,7 +35,7 @@ export function CoverImagePicker({ media: initialMedia, defaultMediaId = "" }: P
       const res = await fetch("/api/media/upload", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) {
-        setUploadError(json.error ?? "Upload failed");
+        setUploadError(json.error ?? "上传失败");
         return;
       }
       const newItem: MediaItem = {
@@ -47,7 +47,7 @@ export function CoverImagePicker({ media: initialMedia, defaultMediaId = "" }: P
       setSelectedId(newItem.id);
       setShowPicker(false);
     } catch {
-      setUploadError("Upload failed");
+      setUploadError("上传失败");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -61,7 +61,7 @@ export function CoverImagePicker({ media: initialMedia, defaultMediaId = "" }: P
 
   return (
     <div className="space-y-2">
-      <span className="text-sm font-medium">头图 Cover image (optional)</span>
+      <span className="text-sm font-medium">头图（选填）</span>
 
       {/* hidden input that actually submits the value */}
       <input type="hidden" name="coverMediaId" value={selectedId} />
@@ -77,14 +77,14 @@ export function CoverImagePicker({ media: initialMedia, defaultMediaId = "" }: P
               onClick={() => setShowPicker((v) => !v)}
               className="rounded-md border px-3 py-1.5 text-xs hover:bg-zinc-50 transition"
             >
-              更换 / Change
+              更换
             </button>
             <button
               type="button"
               onClick={clear}
               className="rounded-md border px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition"
             >
-              移除 / Remove
+              移除
             </button>
           </div>
         </div>

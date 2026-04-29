@@ -18,7 +18,7 @@ export default async function ProductsPage() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Products</h1>
+          <h1 className="text-2xl font-semibold">产品</h1>
           <p className="text-sm text-zinc-500">{products.length} 个产品</p>
         </div>
         <Link

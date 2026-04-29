@@ -32,9 +32,9 @@ interface ContactData {
 }
 
 const LOCALES: { key: Locale; label: string }[] = [
-  { key: "en", label: "Contact - EN" },
-  { key: "zh", label: "联系方式 - 简中" },
-  { key: "zh-hk", label: "聯繫方式 - 繁中" },
+  { key: "en", label: "英文" },
+  { key: "zh", label: "简体中文" },
+  { key: "zh-hk", label: "繁体中文" },
 ];
 
 function normalizeAddresses(raw: unknown): AddressEntry[] {
@@ -215,7 +215,7 @@ export default function ContactEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-40 text-zinc-400">
-        Loading…
+        加载中…
       </div>
     );
   }
@@ -240,7 +240,7 @@ export default function ContactEditor() {
       </div>
 
       {/* Address */}
-      <Section title="公司地址 / Addresses">
+      <Section title="公司地址">
         <div className="space-y-4">
           {current.addresses.length === 0 && (
             <p className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center text-sm text-zinc-400">
@@ -251,18 +251,18 @@ export default function ContactEditor() {
             <div key={idx} className="rounded-xl border bg-white p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-zinc-600">
-                  地址 {idx + 1} / Address {idx + 1}
+                  地址 {idx + 1}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeAddress(idx)}
                   className="text-xs text-red-500 hover:text-red-700 transition"
                 >
-                  删除 / Remove
+                  删除
                 </button>
               </div>
               <AddressRow
-                label="地区 + 详细地址 / Region & detail"
+                label="地区与详细地址"
                 region={addr.region}
                 detail={addr.detail}
                 onRegion={(v) => patchAddress(idx, { region: v })}
@@ -278,15 +278,15 @@ export default function ContactEditor() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            添加地址 / Add address
+            添加地址
           </button>
         </div>
       </Section>
 
       {/* Phone & Email */}
-      <Section title="联系方式 / Contact Details">
+      <Section title="电话与邮箱">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Field label="联系电话 Phone（多个以逗号分隔）">
+          <Field label="联系电话（多个以逗号分隔）">
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
               value={current.phone}
@@ -295,7 +295,7 @@ export default function ContactEditor() {
               type="tel"
             />
           </Field>
-          <Field label="联系邮箱 Email（多个以逗号分隔）">
+          <Field label="联系邮箱（多个以逗号分隔）">
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
               value={current.email}
@@ -308,7 +308,7 @@ export default function ContactEditor() {
       </Section>
 
       {/* QR Codes */}
-      <Section title="联系二维码 / QR Codes">
+      <Section title="联系二维码">
         <div className="space-y-4">
           {current.qrCodes.length === 0 && (
             <p className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center text-sm text-zinc-400">
@@ -325,11 +325,11 @@ export default function ContactEditor() {
                   onClick={() => removeQr(idx)}
                   className="text-xs text-red-500 hover:text-red-700 transition"
                 >
-                  删除 / Remove
+                  删除
                 </button>
               </div>
 
-              <Field label="标签名 Label（如：WhatsApp、微信）">
+              <Field label="标签名（如：WhatsApp、微信）">
                 <input
                   className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                   value={qr.label}
@@ -338,7 +338,7 @@ export default function ContactEditor() {
                 />
               </Field>
 
-              <Field label="跳转链接 Link（可选，如加好友链接）">
+              <Field label="跳转链接（可选，如加好友链接）">
                 <input
                   className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                   value={qr.link ?? ""}
@@ -347,7 +347,7 @@ export default function ContactEditor() {
                 />
               </Field>
 
-              <Field label="二维码图片 QR Image">
+              <Field label="二维码图片">
                 {qr.imageUrl ? (
                   <div className="flex items-start gap-4">
                     <div className="relative h-28 w-28 overflow-hidden rounded-lg border bg-zinc-100 shrink-0">
@@ -405,13 +405,13 @@ export default function ContactEditor() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            添加二维码 / Add QR Code
+            添加二维码
           </button>
         </div>
       </Section>
 
       {/* Social Links */}
-      <Section title="社交媒体 / Social Media">
+      <Section title="社交媒体">
         <div className="space-y-3">
           {current.socialLinks.length === 0 && (
             <p className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center text-sm text-zinc-400">
@@ -457,7 +457,7 @@ export default function ContactEditor() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            添加社交媒体 / Add Social Link
+            添加社交媒体链接
           </button>
         </div>
       </Section>
@@ -469,7 +469,7 @@ export default function ContactEditor() {
           disabled={saving}
           className="rounded-lg bg-black px-6 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
         >
-          {saving ? "保存中…" : "保存 Save"}
+          {saving ? "保存中…" : "保存"}
         </button>
         {saveStatus === "success" && (
           <span className="text-sm text-green-600 font-medium">✓ 已保存</span>
@@ -537,13 +537,13 @@ function AddressRow({
           className="w-36 shrink-0 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
           value={region}
           onChange={(e) => onRegion(e.target.value)}
-          placeholder="地区 Region"
+          placeholder="地区"
         />
         <input
           className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
           value={detail}
           onChange={(e) => onDetail(e.target.value)}
-          placeholder="具体地址 Detail"
+          placeholder="详细地址"
         />
       </div>
     </div>

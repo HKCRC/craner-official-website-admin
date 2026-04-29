@@ -39,14 +39,14 @@ export default async function CategoryEditPage({
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Edit category</h1>
+          <h1 className="text-2xl font-semibold">编辑分类</h1>
           <p className="text-sm text-zinc-600">{category.id}</p>
         </div>
         <Link
           className="rounded-md border px-3 py-1.5 hover:bg-zinc-50"
           href="/admin/categories"
         >
-          Back
+          返回
         </Link>
       </div>
 
@@ -74,7 +74,7 @@ export default async function CategoryEditPage({
               </span>
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">大标题 Title (optional)</span>
+              <span className="text-sm font-medium">大标题（选填）</span>
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm"
                 name="title"
@@ -83,7 +83,7 @@ export default async function CategoryEditPage({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">小标题 Subtitle (optional)</span>
+              <span className="text-sm font-medium">小标题（选填）</span>
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm"
                 name="subtitle"
@@ -92,7 +92,7 @@ export default async function CategoryEditPage({
               />
             </label>
             <label className="block space-y-1 md:col-span-2">
-              <span className="text-sm font-medium">描述 Description (optional)</span>
+              <span className="text-sm font-medium">描述（选填）</span>
               <textarea
                 className="w-full rounded-md border px-3 py-2 text-sm resize-none"
                 name="description"
@@ -103,7 +103,7 @@ export default async function CategoryEditPage({
             </label>
           </div>
           <button className="rounded-md bg-black px-4 py-2 text-white font-medium text-sm">
-            Save
+            保存
           </button>
         </form>
       </section>

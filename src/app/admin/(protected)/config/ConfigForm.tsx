@@ -62,7 +62,7 @@ export function ConfigForm({
       <div className="rounded-xl border bg-white overflow-hidden">
         <div className="grid grid-cols-[1fr_1fr_auto] gap-2 border-b bg-zinc-50 px-4 py-2 text-xs font-medium text-zinc-500 uppercase tracking-wide">
           <span>Key（英文）</span>
-          <span>Value</span>
+          <span>配置值</span>
           <span className="text-right pr-2"> </span>
         </div>
         <div className="divide-y">

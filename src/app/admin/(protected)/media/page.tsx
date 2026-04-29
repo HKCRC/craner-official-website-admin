@@ -24,18 +24,18 @@ export default async function MediaPage() {
     <div className="space-y-8">
       <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Media library</h1>
-          <p className="text-sm text-zinc-600">Upload images or short videos and reuse URLs in content.</p>
+          <h1 className="text-2xl font-semibold">媒体库</h1>
+          <p className="text-sm text-zinc-600">上传图片或短视频，在文章、产品等内容中复用链接。</p>
         </div>
       </div>
 
       <MediaUpload />
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">All media</h2>
+        <h2 className="text-lg font-semibold">全部文件</h2>
         {media.length === 0 ? (
           <div className="rounded-xl border bg-white p-6 text-sm text-zinc-600">
-            No media yet.
+            暂无媒体文件。
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

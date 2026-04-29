@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const next = useMemo(() => searchParams.get("next") || "/admin", [searchParams]);
 
@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
     setLoading(false);
     if (!res.ok) {
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
-      setError(data?.error ?? "Login failed");
+      setError(data?.error ?? "登录失败");
       return;
     }
     window.location.href = next;
@@ -34,19 +34,19 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md rounded-xl border bg-white p-6 shadow-sm space-y-4">
         <div>
-          <h1 className="text-2xl font-semibold">Admin login</h1>
+          <h1 className="text-2xl font-semibold">管理员登录</h1>
           <p className="text-sm text-zinc-600">
-            If you haven’t created a superadmin yet, go to{" "}
+            若尚未创建超级管理员，请访问{" "}
             <a className="underline" href="/admin/register">
               /admin/register
             </a>
-            .
+            。
           </p>
         </div>
 
         <form className="space-y-3" onSubmit={onSubmit}>
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Email</span>
+            <span className="text-sm font-medium">邮箱</span>
             <input
               className="w-full rounded-md border px-3 py-2"
               value={email}
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
             />
           </label>
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Password</span>
+            <span className="text-sm font-medium">密码</span>
             <input
               className="w-full rounded-md border px-3 py-2"
               value={password}
@@ -74,11 +74,25 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="w-full rounded-md bg-black text-white py-2 font-medium disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "登录中…" : "登录"}
           </button>
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-zinc-50 flex items-center justify-center text-sm text-zinc-600">
+          加载中…
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
 

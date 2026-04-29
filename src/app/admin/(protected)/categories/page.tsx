@@ -42,15 +42,15 @@ export default async function CategoriesPage() {
     <div className="space-y-8">
       <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Categories</h1>
+          <h1 className="text-2xl font-semibold">分类</h1>
           <p className="text-sm text-zinc-600">
-            Posts must be assigned to at least one category.
+            每篇文章需至少关联一个分类。
           </p>
         </div>
       </div>
 
       <section className="rounded-xl border bg-white p-5 space-y-4">
-        <h2 className="text-lg font-semibold">Create category</h2>
+        <h2 className="text-lg font-semibold">新建分类</h2>
         <form action={createCategory} className="space-y-3">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <label className="block space-y-1">
@@ -70,36 +70,36 @@ export default async function CategoriesPage() {
               </span>
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">大标题 Title (optional)</span>
+              <span className="text-sm font-medium">大标题（选填）</span>
               <input className="w-full rounded-md border px-3 py-2 text-sm" name="title" placeholder="页面展示的大标题" />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">小标题 Subtitle (optional)</span>
+              <span className="text-sm font-medium">小标题（选填）</span>
               <input className="w-full rounded-md border px-3 py-2 text-sm" name="subtitle" placeholder="大标题下方的副标题" />
             </label>
             <label className="block space-y-1 md:col-span-2">
-              <span className="text-sm font-medium">描述 Description (optional)</span>
+              <span className="text-sm font-medium">描述（选填）</span>
               <textarea className="w-full rounded-md border px-3 py-2 text-sm resize-none" name="description" rows={2} placeholder="分类的简短描述" />
             </label>
           </div>
           <button className="rounded-md bg-black px-4 py-2 text-white font-medium text-sm">
-            Create
+            创建
           </button>
         </form>
       </section>
 
       <section className="rounded-xl border bg-white overflow-hidden">
         <div className="px-5 py-4 border-b">
-          <h2 className="text-lg font-semibold">All categories</h2>
+          <h2 className="text-lg font-semibold">全部分类</h2>
         </div>
         <table className="w-full text-sm">
           <thead className="bg-zinc-50 text-zinc-600">
             <tr>
-              <th className="text-left font-medium px-5 py-3">Name</th>
+              <th className="text-left font-medium px-5 py-3">名称</th>
               <th className="text-left font-medium px-5 py-3">Slug</th>
               <th className="text-left font-medium px-5 py-3">大标题 / 小标题</th>
               <th className="text-left font-medium px-5 py-3">描述</th>
-              <th className="text-right font-medium px-5 py-3">Actions</th>
+              <th className="text-right font-medium px-5 py-3">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -120,12 +120,12 @@ export default async function CategoriesPage() {
                     className="rounded-md border px-3 py-1.5 hover:bg-zinc-50"
                     href={`/admin/categories/${c.id}`}
                   >
-                    Edit
+                    编辑
                   </Link>
                   <form action={deleteCategory}>
                     <input type="hidden" name="id" value={c.id} />
                     <button className="rounded-md border px-3 py-1.5 hover:bg-zinc-50">
-                      Delete
+                      删除
                     </button>
                   </form>
                 </td>

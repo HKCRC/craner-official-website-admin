@@ -33,9 +33,9 @@ interface BannerData {
 }
 
 const LOCALES: { key: Locale; label: string }[] = [
-  { key: "en", label: "Index - EN" },
-  { key: "zh", label: "首页 - 简中" },
-  { key: "zh-hk", label: "首頁 - 繁中" },
+  { key: "en", label: "英文" },
+  { key: "zh", label: "简体中文" },
+  { key: "zh-hk", label: "繁体中文" },
 ];
 
 const emptyCarousel = (): CarouselContent => ({ slides: [] });
@@ -196,7 +196,7 @@ export default function BannerEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-40 text-zinc-400">
-        Loading…
+        加载中…
       </div>
     );
   }
@@ -223,7 +223,7 @@ export default function BannerEditor() {
       {/* Template selector */}
       <div className="rounded-xl border bg-white p-5 space-y-4">
         <h2 className="text-base font-semibold text-zinc-700">
-          选择模版 / Template
+          展示模版
         </h2>
         <div className="flex gap-3">
           <TemplateCard
@@ -285,7 +285,7 @@ export default function BannerEditor() {
           disabled={saving}
           className="rounded-lg bg-black px-6 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
         >
-          {saving ? "保存中…" : "保存 Save"}
+          {saving ? "保存中…" : "保存"}
         </button>
         {saveStatus === "success" && (
           <span className="text-sm text-green-600 font-medium">✓ 已保存</span>
@@ -357,20 +357,20 @@ function CarouselEditor({
         <div key={idx} className="rounded-xl border bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-zinc-600">
-              第 {idx + 1} 张 / Slide {idx + 1}
+              第 {idx + 1} 张
             </span>
             <button
               onClick={() => onRemove(idx)}
               className="text-xs text-red-500 hover:text-red-700 transition"
             >
-              删除 / Remove
+              删除
             </button>
           </div>
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="space-y-1">
               <label className="text-xs text-zinc-500 font-medium">
-                大标题 Title
+                大标题
               </label>
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -381,7 +381,7 @@ function CarouselEditor({
             </div>
             <div className="space-y-1">
               <label className="text-xs text-zinc-500 font-medium">
-                小标题 Subtitle
+                小标题
               </label>
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -394,7 +394,7 @@ function CarouselEditor({
 
           <div className="space-y-1">
             <label className="text-xs text-zinc-500 font-medium">
-              点击跳转链接 Link（可选）
+              点击跳转链接（可选）
             </label>
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -406,7 +406,7 @@ function CarouselEditor({
 
           <div className="space-y-2">
             <label className="text-xs text-zinc-500 font-medium">
-              图片 Image
+              图片
             </label>
             {slide.imageUrl ? (
               <div className="flex items-start gap-4">
@@ -439,7 +439,7 @@ function CarouselEditor({
                     >
                       <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                     </svg>
-                    <span>点击上传图片 / Upload image</span>
+                    <span>点击上传图片</span>
                   </>
                 )}
                 <input
@@ -465,7 +465,7 @@ function CarouselEditor({
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
-        添加轮播项 / Add slide
+        添加轮播项
       </button>
     </div>
   );
@@ -482,12 +482,12 @@ function VideoEditor({
   return (
     <div className="rounded-xl border bg-white p-5 space-y-4">
       <h2 className="text-base font-semibold text-zinc-700">
-        视频配置 / Video Config
+        视频配置
       </h2>
 
       <div className="space-y-1">
         <label className="text-xs text-zinc-500 font-medium">
-          大标题 Title
+          大标题
         </label>
         <input
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -499,7 +499,7 @@ function VideoEditor({
 
       <div className="space-y-1">
         <label className="text-xs text-zinc-500 font-medium">
-          小标题 Subtitle
+          小标题
         </label>
         <input
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -511,7 +511,7 @@ function VideoEditor({
 
       <div className="space-y-1">
         <label className="text-xs text-zinc-500 font-medium">
-          视频链接 Video URL
+          视频链接
         </label>
         <input
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
@@ -526,7 +526,7 @@ function VideoEditor({
 
       <div className="space-y-1">
         <label className="text-xs text-zinc-500 font-medium">
-          点击跳转链接 Link（可选）
+          点击跳转链接（可选）
         </label>
         <input
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"

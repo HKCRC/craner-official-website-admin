@@ -64,7 +64,7 @@ export default async function NewPostPage() {
       });
 
       revalidatePath("/admin/posts");
-      redirect(`/admin/posts/${post.id}/edit`);
+      redirect(`/admin/posts/${post.id}/edit?created=1`);
     } catch (e) {
       if (isRedirectError(e)) throw e;
       return { ok: false, error: e instanceof Error ? e.message : "创建失败" };

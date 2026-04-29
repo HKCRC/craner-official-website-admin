@@ -84,7 +84,7 @@ export default async function NewProductPage() {
       });
 
       revalidatePath("/admin/products");
-      redirect(`/admin/products/${product.id}/edit`);
+      redirect(`/admin/products/${product.id}/edit?created=1`);
     } catch (e) {
       if (isRedirectError(e)) throw e;
       return { ok: false, error: e instanceof Error ? e.message : "创建失败" };

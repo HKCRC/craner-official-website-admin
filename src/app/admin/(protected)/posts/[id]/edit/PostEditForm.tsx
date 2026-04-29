@@ -34,6 +34,7 @@ interface Props {
   categories: Category[];
   media: MediaItem[];
   initialHtml: string;
+  justCreated?: boolean;
   updateAction: (
     state: ActionState,
     formData: FormData,
@@ -46,6 +47,7 @@ export function PostEditForm({
   categories,
   media,
   initialHtml,
+  justCreated = false,
   updateAction,
   deleteAction,
 }: Props) {
@@ -62,6 +64,7 @@ export function PostEditForm({
 
   return (
     <>
+      {justCreated && <Toast key="created-post" message="创建成功 ✓" type="success" />}
       {state?.ok && (
         // eslint-disable-next-line react-hooks/refs
         <Toast key={toastKey.current} message="保存成功 ✓" type="success" />

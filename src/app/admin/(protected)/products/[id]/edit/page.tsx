@@ -16,13 +16,16 @@ type ActionState = { ok: true } | { ok: false; error: string } | null;
 
 export default async function EditProductPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string }>;
 }) {
   const session = await requireSession().catch(() => null);
   if (!session) redirect("/admin/login");
 
   const { id } = await params;
+  const { created } = await searchParams;
 
   const [product, categories, media] = await Promise.all([
     prisma.product.findUnique({
@@ -131,6 +134,7 @@ export default async function EditProductPage({
       media={media}
       initialBlocks={initialBlocks}
       initialFeatures={initialFeatures}
+      justCreated={created === "1"}
       updateAction={updateProduct}
       deleteAction={deleteProduct}
     />

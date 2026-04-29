@@ -14,13 +14,16 @@ type ActionState = { ok: true } | { ok: false; error: string } | null;
 
 export default async function EditPostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string }>;
 }) {
   const session = await requireSession().catch(() => null);
   if (!session) redirect("/admin/login");
 
   const { id } = await params;
+  const { created } = await searchParams;
   const [post, categories, media] = await Promise.all([
     prisma.post.findUnique({
       where: { id },
@@ -100,6 +103,7 @@ export default async function EditPostPage({
       categories={categories}
       media={media}
       initialHtml={initialHtml}
+      justCreated={created === "1"}
       updateAction={updatePost}
       deleteAction={deletePost}
     />

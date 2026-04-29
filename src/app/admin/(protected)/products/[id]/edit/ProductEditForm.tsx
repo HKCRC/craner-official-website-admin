@@ -35,6 +35,7 @@ interface Props {
   media: MediaItem[];
   initialBlocks: ProductBlock[];
   initialFeatures: FeatureItem[];
+  justCreated?: boolean;
   updateAction: (
     state: ActionState,
     formData: FormData,
@@ -48,6 +49,7 @@ export function ProductEditForm({
   media,
   initialBlocks,
   initialFeatures,
+  justCreated = false,
   updateAction,
   deleteAction,
 }: Props) {
@@ -64,6 +66,7 @@ export function ProductEditForm({
 
   return (
     <>
+      {justCreated && <Toast key="created-product" message="创建成功 ✓" type="success" />}
       {state?.ok && (
         // eslint-disable-next-line react-hooks/refs
         <Toast key={toastKey.current} message="保存成功 ✓" type="success" />

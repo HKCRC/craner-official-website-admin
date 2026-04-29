@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { fromDbBannerLocale, toDbBannerLocale } from "@/lib/banner-locale";
+import { normalizeContactAddressesJson } from "@/lib/contact-info-json";
 
 export const runtime = "nodejs";
 
@@ -11,6 +12,7 @@ const LocaleEnum = z.enum(["en", "zh", "zh-hk"]);
 const QrCodeSchema = z.object({
   label: z.string(),
   imageUrl: z.string(),
+  link: z.string().optional().default(""),
 });
 
 const SocialLinkSchema = z.object({
@@ -18,12 +20,14 @@ const SocialLinkSchema = z.object({
   url: z.string(),
 });
 
+const AddressEntrySchema = z.object({
+  region: z.string(),
+  detail: z.string(),
+});
+
 const BodySchema = z.object({
   locale: LocaleEnum,
-  address1Region: z.string().optional().default(""),
-  address1Detail: z.string().optional().default(""),
-  address2Region: z.string().optional().default(""),
-  address2Detail: z.string().optional().default(""),
+  addresses: z.array(AddressEntrySchema).optional().default([]),
   phone: z.string().optional().default(""),
   email: z.string().optional().default(""),
   qrCodes: z.array(QrCodeSchema).optional().default([]),
@@ -40,7 +44,11 @@ export async function GET() {
 
   return NextResponse.json({
     ok: true,
-    contacts: contacts.map((c) => ({ ...c, locale: fromDbBannerLocale(c.locale) })),
+    contacts: contacts.map((c) => ({
+      ...c,
+      locale: fromDbBannerLocale(c.locale),
+      addresses: normalizeContactAddressesJson(c.addresses),
+    })),
   });
 }
 
@@ -67,6 +75,10 @@ export async function POST(req: Request) {
 
   return NextResponse.json({
     ok: true,
-    contact: { ...contact, locale: fromDbBannerLocale(contact.locale) },
+    contact: {
+      ...contact,
+      locale: fromDbBannerLocale(contact.locale),
+      addresses: normalizeContactAddressesJson(contact.addresses),
+    },
   });
 }

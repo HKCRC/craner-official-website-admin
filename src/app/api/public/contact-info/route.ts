@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { fromDbBannerLocale, toDbBannerLocale } from "@/lib/banner-locale";
+import { normalizeContactAddressesJson } from "@/lib/contact-info-json";
 
 export const runtime = "nodejs";
 
@@ -30,7 +31,11 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      contact: { ...contact, locale: fromDbBannerLocale(contact.locale) },
+      contact: {
+        ...contact,
+        locale: fromDbBannerLocale(contact.locale),
+        addresses: normalizeContactAddressesJson(contact.addresses),
+      },
     });
   }
 
@@ -40,7 +45,11 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     ok: true,
-    contacts: contacts.map((c) => ({ ...c, locale: fromDbBannerLocale(c.locale) })),
+    contacts: contacts.map((c) => ({
+      ...c,
+      locale: fromDbBannerLocale(c.locale),
+      addresses: normalizeContactAddressesJson(c.addresses),
+    })),
   });
 }
 

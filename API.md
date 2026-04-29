@@ -106,18 +106,17 @@
 
 ### 2) 获取单语言 Contact Info
 
-- **GET** ` /api/public/contact-info?locale=EN|ZH|ZH-HK `
+- **GET** ` /api/public/contact-info?locale=en|zh|zh-hk `
 - **Response**
   - `{ ok: true, contact: ContactInfo }`
   - 找不到返回 `404`：`{ ok: false, error: "Not found" }`
 
 **ContactInfo 数据结构（核心字段）**
 
-- `locale`: `"EN" | "ZH" | "ZH-HK"`
-- `address1Region`, `address1Detail`
-- `address2Region`, `address2Detail`
+- `locale`: `"en" | "zh" | "zh-hk"`
+- `addresses`: `Array<{ region: string; detail: string }>`
 - `phone`, `email`
-- `qrCodes`: `Array<{ label: string; imageUrl: string }>`
+- `qrCodes`: `Array<{ label: string; imageUrl: string; link?: string }>`
 - `socialLinks`: `Array<{ platform: string; url: string }>`
 
 ---

@@ -8,6 +8,8 @@ type Locale = "en" | "zh" | "zh-hk";
 interface QrCode {
   label: string;
   imageUrl: string;
+  /** 点击二维码或「加好友」等跳转链接（可选） */
+  link?: string;
 }
 
 interface SocialLink {
@@ -15,12 +17,14 @@ interface SocialLink {
   url: string;
 }
 
+interface AddressEntry {
+  region: string;
+  detail: string;
+}
+
 interface ContactData {
   locale: Locale;
-  address1Region: string;
-  address1Detail: string;
-  address2Region: string;
-  address2Detail: string;
+  addresses: AddressEntry[];
   phone: string;
   email: string;
   qrCodes: QrCode[];
@@ -33,13 +37,37 @@ const LOCALES: { key: Locale; label: string }[] = [
   { key: "zh-hk", label: "聯繫方式 - 繁中" },
 ];
 
+function normalizeAddresses(raw: unknown): AddressEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => {
+    if (!item || typeof item !== "object")
+      return { region: "", detail: "" };
+    const o = item as Record<string, unknown>;
+    return {
+      region: String(o.region ?? ""),
+      detail: String(o.detail ?? ""),
+    };
+  });
+}
+
+function normalizeQrCodes(raw: unknown): QrCode[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => {
+    if (!item || typeof item !== "object")
+      return { label: "", imageUrl: "", link: "" };
+    const o = item as Record<string, unknown>;
+    return {
+      label: String(o.label ?? ""),
+      imageUrl: String(o.imageUrl ?? ""),
+      link: typeof o.link === "string" ? o.link : "",
+    };
+  });
+}
+
 function emptyContact(locale: Locale): ContactData {
   return {
     locale,
-    address1Region: "",
-    address1Detail: "",
-    address2Region: "",
-    address2Detail: "",
+    addresses: [],
     phone: "",
     email: "",
     qrCodes: [],
@@ -68,7 +96,15 @@ export default function ContactEditor() {
         if (!contacts) return;
         setData((prev) => {
           const next = { ...prev };
-          for (const c of contacts) next[c.locale] = c;
+          for (const c of contacts) {
+            next[c.locale] = {
+              ...c,
+              addresses: normalizeAddresses(
+                (c as unknown as { addresses?: unknown }).addresses,
+              ),
+              qrCodes: normalizeQrCodes(c.qrCodes),
+            };
+          }
           return next;
         });
       })
@@ -89,11 +125,33 @@ export default function ContactEditor() {
 
   /* ── QR codes ── */
   function addQr() {
-    patch({ qrCodes: [...current.qrCodes, { label: "", imageUrl: "" }] });
+    patch({
+      qrCodes: [...current.qrCodes, { label: "", imageUrl: "", link: "" }],
+    });
   }
 
   function removeQr(idx: number) {
     patch({ qrCodes: current.qrCodes.filter((_, i) => i !== idx) });
+  }
+
+  function addAddress() {
+    patch({
+      addresses: [...current.addresses, { region: "", detail: "" }],
+    });
+  }
+
+  function removeAddress(idx: number) {
+    patch({
+      addresses: current.addresses.filter((_, i) => i !== idx),
+    });
+  }
+
+  function patchAddress(idx: number, p: Partial<AddressEntry>) {
+    patch({
+      addresses: current.addresses.map((a, i) =>
+        i === idx ? { ...a, ...p } : a,
+      ),
+    });
   }
 
   function patchQr(idx: number, p: Partial<QrCode>) {
@@ -184,27 +242,51 @@ export default function ContactEditor() {
       {/* Address */}
       <Section title="公司地址 / Addresses">
         <div className="space-y-4">
-          <AddressRow
-            label="地址 1 / Address 1"
-            region={current.address1Region}
-            detail={current.address1Detail}
-            onRegion={(v) => patch({ address1Region: v })}
-            onDetail={(v) => patch({ address1Detail: v })}
-          />
-          <AddressRow
-            label="地址 2 / Address 2"
-            region={current.address2Region}
-            detail={current.address2Detail}
-            onRegion={(v) => patch({ address2Region: v })}
-            onDetail={(v) => patch({ address2Detail: v })}
-          />
+          {current.addresses.length === 0 && (
+            <p className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center text-sm text-zinc-400">
+              暂无地址，点击下方按钮添加
+            </p>
+          )}
+          {current.addresses.map((addr, idx) => (
+            <div key={idx} className="rounded-xl border bg-white p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-zinc-600">
+                  地址 {idx + 1} / Address {idx + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeAddress(idx)}
+                  className="text-xs text-red-500 hover:text-red-700 transition"
+                >
+                  删除 / Remove
+                </button>
+              </div>
+              <AddressRow
+                label="地区 + 详细地址 / Region & detail"
+                region={addr.region}
+                detail={addr.detail}
+                onRegion={(v) => patchAddress(idx, { region: v })}
+                onDetail={(v) => patchAddress(idx, { detail: v })}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addAddress}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-300 py-4 text-sm text-zinc-500 transition hover:border-zinc-400 hover:text-black"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            添加地址 / Add address
+          </button>
         </div>
       </Section>
 
       {/* Phone & Email */}
       <Section title="联系方式 / Contact Details">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Field label="联系电话 Phone">
+          <Field label="联系电话 Phone（多个以逗号分隔）">
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
               value={current.phone}
@@ -213,7 +295,7 @@ export default function ContactEditor() {
               type="tel"
             />
           </Field>
-          <Field label="联系邮箱 Email">
+          <Field label="联系邮箱 Email（多个以逗号分隔）">
             <input
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
               value={current.email}
@@ -253,6 +335,15 @@ export default function ContactEditor() {
                   value={qr.label}
                   onChange={(e) => patchQr(idx, { label: e.target.value })}
                   placeholder="WhatsApp"
+                />
+              </Field>
+
+              <Field label="跳转链接 Link（可选，如加好友链接）">
+                <input
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+                  value={qr.link ?? ""}
+                  onChange={(e) => patchQr(idx, { link: e.target.value })}
+                  placeholder="https://"
                 />
               </Field>
 

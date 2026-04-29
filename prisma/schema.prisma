@@ -145,18 +145,17 @@ model FeaturedProduct {
 }
 
 // ContactInfo stores contact page configuration per locale.
-// qrCodes:      [{label:string, imageUrl:string}]
+// addresses:    [{region:string, detail:string}]
+// qrCodes:      [{label:string, imageUrl:string, link?:string}]
 // socialLinks:  [{platform:string, url:string}]
 model ContactInfo {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   locale         BannerLocale @unique
-  address1Region String       @default("")
-  address1Detail String       @default("")
-  address2Region String       @default("")
-  address2Detail String       @default("")
+  // [{ region: string, detail: string }]
+  addresses      Json         @default("[]")
   phone          String       @default("")
   email          String       @default("")
-  // [{label:string, imageUrl:string}]
+  // [{label:string, imageUrl:string, link?:string}]
   qrCodes        Json         @default("[]")
   // [{platform:string, url:string}]
   socialLinks    Json         @default("[]")

@@ -53,9 +53,9 @@ export default async function ProtectedAdminLayout({
   if (!user) redirect("/admin/login");
 
   return (
-    <div className="flex min-h-screen bg-zinc-100">
+    <div className="min-h-screen bg-zinc-100">
       {/* ── Sidebar ── */}
-      <aside className="flex w-56 shrink-0 flex-col bg-zinc-900 text-white">
+      <aside className="fixed inset-y-0 left-0 z-30 flex h-screen w-56 flex-col bg-zinc-900 text-white">
         {/* Logo / brand */}
         <div className="px-5 py-5 border-b border-zinc-700">
           <Link
@@ -129,7 +129,7 @@ export default async function ProtectedAdminLayout({
       </aside>
 
       {/* ── Main content ── */}
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="ml-56 flex min-w-0 flex-1 flex-col">
         <main className="flex-1 overflow-auto p-8">{children}</main>
       </div>
     </div>

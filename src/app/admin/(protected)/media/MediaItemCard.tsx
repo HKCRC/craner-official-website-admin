@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Props = {
   id: string;
@@ -22,17 +22,37 @@ export function MediaItemCard({ id, url, originalName, sizeBytes, mimeType }: Pr
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [manualCopyOpen, setManualCopyOpen] = useState(false);
+  const manualCopyInputRef = useRef<HTMLInputElement>(null);
   const isVideo = mimeType.startsWith("video/");
 
   async function copyUrl() {
     const absolute = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
     try {
-      await navigator.clipboard.writeText(absolute);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setError(null);
+      setManualCopyOpen(false);
+
+      // Clipboard API usually requires HTTPS (or localhost). Provide manual fallback on failure.
+      const canClipboard =
+        typeof navigator !== "undefined" &&
+        typeof window !== "undefined" &&
+        !!navigator.clipboard?.writeText &&
+        window.isSecureContext;
+
+      if (canClipboard) {
+        await navigator.clipboard.writeText(absolute);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      }
+
+      throw new Error("clipboard-unavailable");
     } catch {
-      setError("无法复制到剪贴板");
-      setTimeout(() => setError(null), 2000);
+      setManualCopyOpen(true);
+      setTimeout(() => {
+        manualCopyInputRef.current?.focus();
+        manualCopyInputRef.current?.select();
+      }, 0);
     }
   }
 
@@ -82,6 +102,42 @@ export function MediaItemCard({ id, url, originalName, sizeBytes, mimeType }: Pr
             {busy ? "删除中…" : "删除"}
           </button>
         </div>
+
+        {manualCopyOpen ? (
+          <div className="rounded-lg border bg-zinc-50 p-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] text-zinc-600">
+                当前环境无法自动复制，请手动复制：
+              </div>
+              <button
+                type="button"
+                className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-black"
+                onClick={() => setManualCopyOpen(false)}
+              >
+                关闭
+              </button>
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                ref={manualCopyInputRef}
+                readOnly
+                value={typeof window !== "undefined" ? `${window.location.origin}${url}` : url}
+                className="min-w-0 flex-1 rounded-md border bg-white px-2 py-1 text-[11px] text-zinc-800"
+                onFocus={(e) => e.currentTarget.select()}
+              />
+              <button
+                type="button"
+                className="shrink-0 rounded-md border bg-white px-2 py-1 text-[11px] text-zinc-700 hover:bg-zinc-100"
+                onClick={() => {
+                  manualCopyInputRef.current?.focus();
+                  manualCopyInputRef.current?.select();
+                }}
+              >
+                全选
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
